@@ -1,23 +1,27 @@
-// Builds a single self-contained, phone-friendly HTML page of the next week's game environments and player
-// projections (data/out/mobile/week.html). Published as a private page you can open in the Claude app.
-// Usage: node pipeline/export-mobile.mjs [season week]
+// Builds a single self-contained, phone-friendly HTML page with every week of the season: game environments and
+// player projections (data/out/mobile/week.html), with week tabs. It opens on the current week, the week of the
+// next game not yet played, so the same link rolls forward on its own. Published as a private page for the Claude app.
+// Usage: node pipeline/export-mobile.mjs [season]
 import fs from 'node:fs';
 import path from 'node:path';
 import { OUT } from './lib/config.mjs';
 
 const meta = JSON.parse(fs.readFileSync(path.join(OUT, 'meta.json'), 'utf8'));
 const season = +(process.argv[2] || meta.next_week.season);
-const week = +(process.argv[3] || meta.next_week.week);
-const games = JSON.parse(fs.readFileSync(path.join(OUT, 'games.json'), 'utf8'))
-  .filter(g => g.season === season && g.week === week)
+const allGames = JSON.parse(fs.readFileSync(path.join(OUT, 'games.json'), 'utf8'))
+  .filter(g => g.season === season)
   .sort((a, b) => (a.gameday + a.gametime < b.gameday + b.gametime ? -1 : a.gameday + a.gametime > b.gameday + b.gametime ? 1 : a.game_id < b.game_id ? -1 : 1));
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const f0 = v => (v == null ? '–' : Math.round(v).toString());
 const f1 = v => (v == null ? '–' : (Math.round(v * 10) / 10).toFixed(1));
+const f1x = f1;
 const pct = v => (v == null ? '–' : `${Math.round(v * 100)}%`);
 const sgn = v => (v > 0 ? `+${v}` : `${v}`);
-const slug = g => `${g.away}-${g.home}`.toLowerCase();
+const slug = g => `w${g.week}-${g.away}-${g.home}`.toLowerCase();
+const weeks = [...new Set(allGames.map(g => g.week))].sort((a, b) => a - b);
+const upcoming = allGames.filter(g => !g.done);
+const currentWeek = upcoming.length ? upcoming[0].week : weeks.at(-1);
 const kick = g => {
   const d = new Date(`${g.gameday}T12:00:00`);
   const day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -27,8 +31,9 @@ const kick = g => {
 };
 
 // one short line of the stats that matter for this position
-function keyLine(p) {
+function keyLine(p, actual = false) {
   const s = p.proj || {};
+  const f1 = actual ? f0 : f1x;
   const parts = [];
   if (p.pos === 'QB') {
     if (s.attempts) parts.push(`${f1(s.attempts)} att`);
@@ -49,8 +54,10 @@ function teamBlock(g, side) {
   const team = g[side];
   let sheet = [];
   try { sheet = JSON.parse(fs.readFileSync(path.join(OUT, 'games', `${g.game_id}.json`), 'utf8')); } catch {}
-  const rows = sheet.filter(r => r.team === team).sort((a, b) => (b.proj?.fantasy_points_ppr ?? 0) - (a.proj?.fantasy_points_ppr ?? 0));
-  const active = rows.filter(r => (r.proj?.fantasy_points_ppr ?? 0) >= 1 && !/^Out/.test(r.injury || ''));
+  const done = g.done;
+  const val = r => (done ? r.stats?.fantasy_points_ppr : r.proj?.fantasy_points_ppr) ?? 0;
+  const rows = sheet.filter(r => r.team === team).sort((a, b) => val(b) - val(a));
+  const active = rows.filter(r => (done ? Math.max(val(r), r.proj?.fantasy_points_ppr ?? 0) >= 1 && r.stats : (r.proj?.fantasy_points_ppr ?? 0) >= 1) && !/^Out/.test(r.injury || ''));
   const out = rows.filter(r => /^Out/.test(r.injury || ''));
   const max = Math.max(20, ...active.map(r => r.range?.fantasy_points_ppr?.[18] ?? 0));
   const pts = g.pred?.[`${side}_pts`];
@@ -59,12 +66,17 @@ function teamBlock(g, side) {
     const lo = rg ? rg[2] : null, hi = rg ? rg[18] : null;
     const tag = r.injury ? `<span class="tag ${/Doubtful/.test(r.injury) ? 'bad' : 'warn'}">${esc(r.injury.split(' ')[0])}</span>` : '';
     const bar = rg ? `<span class="rg" aria-hidden="true"><i style="left:${(lo / max) * 100}%;width:${((hi - lo) / max) * 100}%"></i><b style="left:${(ppr / max) * 100}%"></b></span>` : '';
+    if (done) {
+      const act = r.stats?.fantasy_points_ppr, diff = act != null && ppr != null ? act - ppr : null;
+      return `<tr><td class="who"><span class="nm">${esc(r.name)}</span> <span class="pos">${r.pos}</span><div class="kl">${esc(keyLine({ pos: r.pos, proj: r.stats }, true))}</div></td>
+      <td class="ppr">${f1(act)}<div class="rng">proj ${f1(ppr)}${diff != null && Math.abs(diff) >= 0.05 ? ` · <span class="${diff > 0 ? 'up' : 'down'}">${diff > 0 ? '+' : '−'}${f1(Math.abs(diff))}</span>` : ''}</div></td></tr>`;
+    }
     return `<tr><td class="who"><span class="nm">${esc(r.name)}</span> <span class="pos">${r.pos}</span>${tag}<div class="kl">${esc(keyLine(r))}</div></td>
       <td class="ppr">${f1(ppr)}<div class="rng">${f1(lo)}–${f1(hi)}</div>${bar}</td></tr>`;
   }).join('');
-  const outLine = out.length ? `<p class="out">Out: ${out.map(r => `${esc(r.name)} <span class="muted">(${esc((r.injury.match(/\((.*)\)/) || [])[1] || 'Out')})</span>`).join(', ')}</p>` : '';
-  return `<section class="team"><h3><span>${team}</span><span class="side">${side}</span><span class="tp">${f1(pts)} pts proj</span></h3>
-    ${active.length ? `<div class="tw"><table><thead><tr><th>Player</th><th>PPR · 80% range</th></tr></thead><tbody>${body}</tbody></table></div>` : '<p class="muted">No projections yet.</p>'}
+  const outLine = !done && out.length ? `<p class="out">Out: ${out.map(r => `${esc(r.name)} <span class="muted">(${esc((r.injury.match(/\((.*)\)/) || [])[1] || 'Out')})</span>`).join(', ')}</p>` : '';
+  return `<section class="team"><h3><span>${team}</span><span class="side">${side}</span><span class="tp">${done ? `${g[`${side}_score`]} pts · proj ${f1(pts)}` : `${f1(pts)} pts proj`}</span></h3>
+    ${active.length ? `<div class="tw"><table><thead><tr><th>Player</th><th>${done ? 'PPR · vs projection' : 'PPR · 80% range'}</th></tr></thead><tbody>${body}</tbody></table></div>` : '<p class="muted">No projections yet.</p>'}
     ${outLine}</section>`;
 }
 
@@ -76,11 +88,19 @@ function gameCard(g) {
   const wx = g.indoor ? 'Indoors' : g.temp != null ? `${Math.round(g.temp)}°F · wind ${Math.round(g.wind ?? 0)} mph${g.precip > 0.02 ? ` · rain ${g.precip.toFixed(2)}"` : ''}` : 'Forecast pending';
   const wp = p.home_wp;
   const lean = p.total != null && g.total_line != null && Math.abs(p.total - g.total_line) >= 3 ? `<span class="lean">Model leans ${p.total > g.total_line ? 'over' : 'under'}</span>` : '';
+  if (g.done) { // who actually took the snaps, from the box score
+    let sheet = [];
+    try { sheet = JSON.parse(fs.readFileSync(path.join(OUT, 'games', `${g.game_id}.json`), 'utf8')); } catch {}
+    for (const side of ['home', 'away']) {
+      const qb = sheet.filter(r => r.team === g[side] && r.pos === 'QB').sort((a, b) => (b.stats?.attempts ?? 0) - (a.stats?.attempts ?? 0))[0];
+      if (qb?.stats?.attempts) g[`${side}_qb`] = qb.name;
+    }
+  }
   const qbs = [g.away_qb, g.home_qb].every(Boolean) ? `<p class="qbs">QBs: ${esc(g.away_qb)} vs ${esc(g.home_qb)}</p>` : '';
   return `<details class="game" id="${slug(g)}">
   <summary>
-    <div class="when"><span>${day}</span><span>${t}</span></div>
-    <div class="match"><span class="ab">${g.away}</span><span class="sc">${f1(p.away_pts)}</span><span class="at">@</span><span class="ab">${g.home}</span><span class="sc">${f1(p.home_pts)}</span></div>
+    <div class="when"><span>${day}</span><span>${g.done ? `<b class="final">Final</b> · proj ${f1(p.away_pts)}–${f1(p.home_pts)}` : t}</span></div>
+    <div class="match"><span class="ab">${g.away}</span><span class="sc${g.done ? ' fin' : ''}">${g.done ? g.away_score : f1(p.away_pts)}</span><span class="at">@</span><span class="ab">${g.home}</span><span class="sc${g.done ? ' fin' : ''}">${g.done ? g.home_score : f1(p.home_pts)}</span></div>
     <div class="wp" role="img" aria-label="${g.home} win probability ${pct(wp)}"><i style="width:${wp != null ? (1 - wp) * 100 : 50}%"></i></div>
     <div class="lines">
       <div><em>Spread</em><b>${mfav}</b><span>Vegas ${fav ?? '–'}</span></div>
@@ -94,7 +114,7 @@ function gameCard(g) {
 }
 
 const stamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-const html = `<title>Gridiron Lab Week ${week}</title>
+const html = `<title>Gridiron Lab Weekly</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap">
@@ -112,6 +132,7 @@ const html = `<title>Gridiron Lab Week ${week}</title>
   --bg: #0f120f; --card: #181c18; --line: #2a302a; --fg: #eef1ea; --fg2: #c0c6b9; --muted: #868d80;
   --turf: #5cc27f; --turf-soft: #1b3122; --chalk: #3a423a; --warn: #e6b04a; --warn-bg: #3a2e14; --bad: #f07b72; --bad-bg: #3d1d1b; color-scheme: dark; }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { background: var(--bg); color: var(--fg); font: 14px/1.4 var(--body); font-variant-numeric: tabular-nums; }
 .wrap { max-width: 760px; margin: 0 auto; padding-block: 18px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 12px; }
 header h1 { font: 700 34px/1 var(--display); letter-spacing: .01em; text-transform: uppercase; margin: 0; text-wrap: balance; }
@@ -120,7 +141,7 @@ header p { margin: 6px 0 0; color: var(--fg2); font-size: 13px; }
 .muted { color: var(--muted); }
 .jump { display: flex; flex-wrap: wrap; gap: 6px; }
 .jump a { font: 600 13px/1 var(--display); letter-spacing: .04em; color: var(--fg2); text-decoration: none; border: 1px solid var(--line); background: var(--card); border-radius: 6px; padding: 6px 8px; }
-.day { font: 700 15px/1 var(--display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 10px 0 0; }
+.day { margin: 10px 0 0 !important; font: 700 15px/1 var(--display); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 10px 0 0; }
 .game { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .game[open] { border-color: var(--turf); }
 summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; gap: 8px; }
@@ -166,37 +187,70 @@ td.ppr { font: 600 18px/1.1 var(--display); width: 112px; padding-left: 10px; }
 .rg b { position: absolute; top: 0; width: 3px; height: 10px; margin-left: -1px; border-radius: 1px; background: var(--turf); }
 .out { margin: 6px 0 0; font-size: 12px; color: var(--fg2); }
 footer { font-size: 12px; color: var(--muted); }
+.weeks { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.weeks::-webkit-scrollbar { display: none; }
+.weeks a { flex: none; min-width: 44px; text-align: center; font: 700 15px/1 var(--display); color: var(--fg2); text-decoration: none; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 9px 10px; }
+.weeks a.cur { border-color: var(--turf); color: var(--turf); }
+.weeks a.on { background: var(--turf); border-color: var(--turf); color: var(--card); }
+.weeks a:focus-visible, .jump a:focus-visible { outline: 2px solid var(--turf); outline-offset: 2px; }
+.week { display: grid; gap: 12px; }
+.wk-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.wk-head h2 { margin: 0; font: 700 30px/1 var(--display); text-transform: uppercase; letter-spacing: .01em; }
+.wk-head h2 span { color: var(--turf); }
+.wk-head p { margin: 0; font-size: 12px; color: var(--muted); }
+.final { color: var(--fg); font-weight: 600; }
+.sc.fin { color: var(--fg); font-weight: 700; }
+.up { color: var(--turf); } .down { color: var(--bad); }
 @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
 </style>
 <div class="wrap">
 <header>
-  <h1>Week ${week} <span>projections</span></h1>
+  <h1>Gridiron <span>Lab</span></h1>
   <p>${season} season · updated ${esc(stamp)} ET · tap a game for player projections</p>
 </header>
-<nav class="jump" aria-label="Jump to game">${games.map(g => `<a href="#${slug(g)}">${g.away}@${g.home}</a>`).join('')}</nav>
-${(() => {
-  let lastDay = '', out = '';
+<nav class="weeks" aria-label="Choose week">${weeks.map(w => `<a href="#w${w}" data-w="${w}" class="${w === currentWeek ? 'cur' : ''}">${w}</a>`).join('')}</nav>
+${weeks.map(w => {
+  const games = allGames.filter(g => g.week === w);
+  const nDone = games.filter(g => g.done).length;
+  const status = nDone === games.length ? 'Final results vs projections' : nDone ? `${nDone} of ${games.length} games final` : `${games.length} games`;
+  let lastDay = '', cards = '';
   for (const g of games) {
     const { day } = kick(g);
-    if (day !== lastDay) { out += `<h2 class="day">${day}</h2>`; lastDay = day; }
-    out += gameCard(g);
+    if (day !== lastDay) { cards += `<h3 class="day">${day}</h3>`; lastDay = day; }
+    cards += gameCard(g);
   }
-  return out;
-})()}
+  return `<section class="week" id="w${w}" data-w="${w}"${w === currentWeek ? '' : ' hidden'}>
+  <div class="wk-head"><h2>Week ${w}${w === currentWeek ? ' <span>this week</span>' : ''}</h2><p>${status}</p></div>
+  <nav class="jump" aria-label="Jump to game">${games.map(g => `<a href="#${slug(g)}">${g.away}@${g.home}</a>`).join('')}</nav>
+  ${cards}
+</section>`;
+}).join('')}
 <footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable.</footer>
 </div>
 <script>
-// open the game named in the link (#bal-car) and keep it in sync when jumping between games
-function openHash() {
-  const id = decodeURIComponent(location.hash.slice(1));
-  const el = id && document.getElementById(id);
-  if (el && el.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({ block: 'start' }); }
+// Week tabs: #w12 shows week 12, #w12-kc-buf shows week 12 and opens that game; no hash shows the current week.
+const CURRENT = ${currentWeek};
+function showWeek(w) {
+  document.querySelectorAll('section.week').forEach(s => { s.hidden = +s.dataset.w !== w; });
+  document.querySelectorAll('.weeks a').forEach(a => {
+    const on = +a.dataset.w === w;
+    a.classList.toggle('on', on);
+    if (on) { a.setAttribute('aria-current', 'page'); a.scrollIntoView({ block: 'nearest', inline: 'center' }); } else a.removeAttribute('aria-current');
+  });
 }
-window.addEventListener('hashchange', openHash);
-openHash();
+function route() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const m = /^w([0-9]+)/.exec(id);
+  const el = id && document.getElementById(id);
+  showWeek(m && document.getElementById('w' + m[1]) ? +m[1] : CURRENT);
+  if (el && el.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({ block: 'start' }); }
+  else if (m) window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+route();
 </script>
 `;
 const dir = path.join(OUT, 'mobile');
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(path.join(dir, 'week.html'), html);
-console.log(`wrote data/out/mobile/week.html (${games.length} games, week ${week}, ${(html.length / 1024).toFixed(0)} KB)`);
+console.log(`wrote data/out/mobile/week.html (${allGames.length} games, weeks ${weeks[0]}-${weeks.at(-1)}, opens on week ${currentWeek}, ${(html.length / 1024).toFixed(0)} KB)`);
