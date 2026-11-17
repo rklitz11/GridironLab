@@ -1,0 +1,19 @@
+{
+  "name": "gridiron-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "NFL game-by-game offensive stats aggregator and projection engine",
+  "scripts": {
+    "fetch": "node pipeline/fetch.mjs",
+    "weather": "node pipeline/weather.mjs",
+    "build": "node pipeline/build.mjs",
+    "model": "node pipeline/model.mjs",
+    "update": "node pipeline/fetch.mjs && node pipeline/weather.mjs && node pipeline/build.mjs && node pipeline/model.mjs",
+    "start": "node server.mjs",
+    "mobile": "node pipeline/export-mobile.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gridiron Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#/">Gridiron<span>Lab</span></a>
+    <nav>
+      <a href="#/" data-nav="slate">Slate</a>
+      <a href="#/projections" data-nav="projections">Projections</a>
+      <a href="#/model" data-nav="model">Model</a>
+    </nav>
+    <div class="search">
+      <input id="search" type="search" placeholder="Search players…" autocomplete="off">
+      <div id="search-results" class="search-results" hidden></div>
+    </div>
+    <button id="theme" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+  </header>
+  <main id="app"><div class="loading">Loading data…</div></main>
+  <div id="tip" class="tip" hidden></div>
+  <footer class="foot" id="foot"></footer>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
