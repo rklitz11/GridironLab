@@ -15,7 +15,7 @@ Run `npm run update` whenever you want fresh data. During the season, nflverse u
 
 ### Phone page
 
-`npm run mobile` writes `data/out/mobile/week.html`, a single page with the next week's games and player projections laid out for a phone. It's published as a private page at https://claude.ai/artifact/C1SVFLXgwuayYLnRwr88VR, which you can open in the Claude app. To refresh it, run `npm run update && npm run mobile` and ask Claude to republish the page.
+`npm run mobile` writes `data/out/mobile/week.html`, a single page with the next week's games and player projections laid out for a phone. It's published as a private page at https://claude.ai/artifact/C1SVFLXgwuayYLnRwr88VR, which you can open in the Claude app. Two scheduled Claude Code cloud routines refresh it automatically, so no computer needs to be on: Sunday at 10 AM, 2 PM and 6 PM ET, and Monday, Wednesday and Thursday at 6 PM ET. Each run takes about 8 minutes. Manage them at https://claude.ai/code/routines. To refresh by hand, run `npm run update && npm run mobile` and ask Claude to republish the page.
 
 ### Upcoming-week availability
 
