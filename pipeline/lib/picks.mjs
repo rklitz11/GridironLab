@@ -70,13 +70,13 @@ export function calibRows(players, fromSeason, toSeason = Infinity) {
  * his season-to-date average (3+ games), then the top 3-5 per game. Players listed with an injury are skipped,
  * since a pick on them is really a bet on whether they play.
  */
-export function buildPicks(players, calib, season, want) {
+export function buildPicks(players, calib, season, want, eligible = () => true) {
   const byGame = {};
   for (const p of players) {
     const log = p.log.filter(g => g.season === season);
     for (let i = 0; i < log.length; i++) {
       const g = log[i];
-      if (!g.proj || !want(g) || (!g.stats && g.injury)) continue;
+      if (!g.proj || !want(g) || (!g.stats && g.injury) || !eligible(p, g)) continue;
       const prior = log.slice(0, i).filter(h => h.stats);
       if (prior.length < 3) continue;
       let best = null;
@@ -101,4 +101,37 @@ export function buildPicks(players, calib, season, want) {
     byGame[id] = (strong.length >= 3 ? strong : list).slice(0, 5);
   }
   return byGame;
+}
+
+// ---------------------------------------------------------------- value vs a sportsbook
+const normName = s => String(s || '').toLowerCase().replace(/[.'’-]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/\s+/g, ' ').trim();
+const implied = a => (a < 0 ? -a / (-a + 100) : 100 / (a + 100));
+export const MIN_EDGE = 0.05;
+// Gaps bigger than this were, in practice, the model missing news the market has (a back returning from injury,
+// a new role). They are shown apart from value plays, not as value.
+export const MAX_EDGE = 0.12;
+
+/**
+ * Compare saved sportsbook lines with the model. For each line: the model's chance of OVER from the calibrated
+ * distribution, the book's fair chance (vig removed from the two prices), and the edge on the better side.
+ * `sheet` is the game's player rows ({name, team, proj, stats}). Returns all priced lines, best edge first.
+ */
+export function valueLines(props, sheet, calib, eligible = () => true) {
+  const byName = new Map(sheet.map(r => [normName(r.name), r]));
+  const out = [];
+  for (const l of props.lines) {
+    const r = byName.get(normName(l.player));
+    const proj = r?.proj?.[l.stat];
+    if (proj == null || r.injury || !eligible(r)) continue;
+    const po = shrink(pOver(distFor(calib, l.stat, proj), l.line));
+    const io = implied(l.over), iu = implied(l.under);
+    const fairOver = io / (io + iu);
+    const over = po - fairOver >= (1 - po) - (1 - fairOver);
+    const edge = over ? po - fairOver : fairOver - po;
+    const v = { name: r.name, pos: r.pos, team: r.team, stat: l.stat, line: l.line, over, price: over ? l.over : l.under,
+      model: over ? po : 1 - po, book: over ? fairOver : 1 - fairOver, edge, proj };
+    if (r.stats) { const a = r.stats[l.stat] ?? 0; v.act = a; v.hit = a === l.line ? null : over ? a > l.line : a < l.line; }
+    out.push(v);
+  }
+  return out.sort((a, b) => b.edge - a.edge);
 }

@@ -9,9 +9,10 @@
     "weather": "node pipeline/weather.mjs",
     "build": "node pipeline/build.mjs",
     "model": "node pipeline/model.mjs",
-    "update": "node pipeline/fetch.mjs && node pipeline/weather.mjs && node pipeline/build.mjs && node pipeline/model.mjs",
+    "update": "node pipeline/fetch.mjs && node pipeline/weather.mjs && node pipeline/build.mjs && node pipeline/model.mjs && node pipeline/props.mjs",
     "start": "node server.mjs",
-    "mobile": "node pipeline/export-mobile.mjs"
+    "mobile": "node pipeline/export-mobile.mjs",
+    "props": "node pipeline/props.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -5,7 +5,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { OUT } from './lib/config.mjs';
-import { loadPlayers, calibRows, buildCalib, buildPicks } from './lib/picks.mjs';
+import { loadPlayers, calibRows, buildCalib, buildPicks, valueLines, STATS, MIN_EDGE, MAX_EDGE } from './lib/picks.mjs';
+import { CACHE } from './lib/config.mjs';
 
 const meta = JSON.parse(fs.readFileSync(path.join(OUT, 'meta.json'), 'utf8'));
 const season = +(process.argv[2] || meta.next_week.season);
@@ -30,7 +31,25 @@ const PICK_SCOPE = process.env.PICK_SCOPE || 'next';
 const nextDay = upcoming.length ? upcoming[0].gameday : null;
 const players = loadPlayers(path.join(OUT, 'players'));
 const liveCalib = buildCalib(calibRows(players, meta.test_from));
-const picks = buildPicks(players, liveCalib, season, g => !g.stats && (PICK_SCOPE === 'all' || g.gameday === nextDay));
+// A player whose role is uncertain (missed his team's last game) gets no call or value play.
+const byGsis = Object.fromEntries(players.map(p => [p.gsis, p]));
+const lastDone = (team, before) => allGames.filter(x => x.done && (x.home === team || x.away === team) && x.gameday < before).sort((a, b) => (a.gameday < b.gameday ? 1 : -1))[0]?.game_id;
+const playedLast = (gsis, team, gameday) => { const id = lastDone(team, gameday); return !id || !!byGsis[gsis]?.log.some(x => x.game_id === id && x.stats); };
+const picks = buildPicks(players, liveCalib, season, g => !g.stats && (PICK_SCOPE === 'all' || g.gameday === nextDay), (p, g) => playedLast(p.gsis, g.team, g.gameday));
+
+// Value vs Hard Rock: saved prop lines (pipeline/props.mjs) against the model, graded once games finish.
+const value = {}, record = { value: [0, 0], big: [0, 0] };
+for (const g of allGames) {
+  const f = path.join(CACHE, 'props', `${g.game_id}.json`);
+  if (!fs.existsSync(f)) continue;
+  const props = JSON.parse(fs.readFileSync(f, 'utf8'));
+  let sheet = [];
+  try { sheet = JSON.parse(fs.readFileSync(path.join(OUT, 'games', `${g.game_id}.json`), 'utf8')); } catch {}
+  const all = valueLines(props, sheet, liveCalib, r => playedLast(r.gsis, r.team, g.gameday));
+  const v = { fetched: props.fetched_at, plays: all.filter(x => x.edge >= MIN_EDGE && x.edge <= MAX_EDGE).slice(0, 3), big: all.filter(x => x.edge > MAX_EDGE).slice(0, 2) };
+  for (const [k, list] of [['value', v.plays], ['big', v.big]]) for (const x of list) if (x.hit != null) record[k][x.hit ? 0 : 1]++;
+  value[g.game_id] = v;
+}
 const kick = g => {
   const d = new Date(`${g.gameday}T12:00:00`);
   const day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -99,6 +118,22 @@ function picksBlock(list) {
     <span class="conf">${Math.round(c.conf * 100)}%</span></li>`).join('')}</ul></div>`;
 }
 
+function valueBlock(g) {
+  const v = value[g.game_id];
+  if (!v) return '';
+  const when = new Date(v.fetched).toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit' });
+  const fmtLine = x => `${x.line} ${STATS[x.stat]?.label || x.stat} (${x.price > 0 ? '+' : ''}${x.price})`;
+  const row = x => `<li>
+    <span class="dir ${x.over ? 'over' : 'under'}">${x.over ? 'Over' : 'Under'}</span>
+    <span class="what"><b>${esc(x.name)}</b> <span class="pos">${x.pos}</span> ${fmtLine(x)}
+      <span class="why">model ${Math.round(x.model * 100)}% · Hard Rock ${Math.round(x.book * 100)}% · proj ${STATS[x.stat] && ['receptions', 'carries'].includes(x.stat) ? f1(x.proj) : f0(x.proj)}${x.act != null ? ` · actual ${x.act}` : ''}</span></span>
+    <span class="conf">${x.hit == null ? '+' + Math.round(x.edge * 100) : x.hit ? '<span class="up">Hit</span>' : '<span class="down">Miss</span>'}</span></li>`;
+  return `<div class="picks value"><h4>Value vs Hard Rock</h4>
+  ${v.plays.length ? `<ul>${v.plays.map(row).join('')}</ul>` : `<p class="vnote">No gaps of ${Math.round(MIN_EDGE * 100)}–${Math.round(MAX_EDGE * 100)} points.</p>`}
+  ${v.big.length ? `<p class="vsub">Big gaps: usually news the model missed</p><ul>${v.big.map(row).join('')}</ul>` : ''}
+  <p class="vnote">Lines from ${when} ET. Numbers on the right are model minus Hard Rock, in percentage points, with the vig removed.</p></div>`;
+}
+
 function gameCard(g) {
   const p = g.pred || {};
   const { day, t } = kick(g);
@@ -128,6 +163,7 @@ function gameCard(g) {
     </div>
     <div class="ctx"><span>${esc(wx)}</span>${lean}<span class="chev" aria-hidden="true"></span></div>
     ${picksBlock(picks[g.game_id])}
+    ${valueBlock(g)}
   </summary>
   <div class="body">${qbs}${teamBlock(g, 'home')}${teamBlock(g, 'away')}</div>
 </details>`;
@@ -236,6 +272,10 @@ footer { font-size: 12px; color: var(--muted); }
 .picks .what { font-size: 13px; min-width: 0; }
 .picks .why { display: block; font-size: 11px; color: var(--muted); }
 .picks .conf { font: 700 18px/1 var(--display); }
+.picks.value h4 { color: var(--fg2); }
+.vsub { margin: 8px 0 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--warn); }
+.vnote { margin: 6px 0 0; font-size: 11px; color: var(--muted); }
+.record { font-size: 12px; color: var(--fg2); }
 .weeks { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .weeks::-webkit-scrollbar { display: none; }
 .weeks a { flex: none; min-width: 44px; text-align: center; font: 700 15px/1 var(--display); color: var(--fg2); text-decoration: none; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 9px 10px; }
@@ -256,6 +296,7 @@ footer { font-size: 12px; color: var(--muted); }
 <header>
   <h1>Gridiron <span>Lab</span></h1>
   <p>${season} season · updated ${esc(stamp)} ET · tap a game for player projections</p>
+  ${record.value[0] + record.value[1] + record.big[0] + record.big[1] ? `<p class="record">Value vs Hard Rock so far: ${record.value[0]}–${record.value[1]} · big gaps ${record.big[0]}–${record.big[1]}</p>` : ''}
 </header>
 <nav class="weeks" aria-label="Choose week">${weeks.map(w => `<a href="#w${w}" data-w="${w}" class="${w === currentWeek ? 'cur' : ''}">${w}</a>`).join('')}</nav>
 ${weeks.map(w => `<section class="week" id="w${w}" data-w="${w}" hidden><p class="muted">Loading Week ${w}…</p></section>`).join('')}
