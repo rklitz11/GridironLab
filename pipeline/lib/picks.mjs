@@ -8,6 +8,7 @@ import path from 'node:path';
 export const STATS = {
   passing_yards: { pos: ['QB'], min: 150, label: 'pass yds' },
   completions: { pos: ['QB'], min: 14, label: 'completions' },
+  attempts: { pos: ['QB'], min: 20, label: 'pass att' },
   rushing_yards: { pos: ['QB', 'RB'], min: 25, label: 'rush yds' },
   carries: { pos: ['RB'], min: 8, label: 'carries' },
   receiving_yards: { pos: ['RB', 'WR', 'TE'], min: 25, label: 'rec yds' },

@@ -7,13 +7,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, CACHE } from './lib/config.mjs';
 
+// In priority order: each pull takes as many as the month's credit budget allows (1 credit per market per game).
 export const MARKETS = {
   player_pass_yds: 'passing_yards',
   player_rush_yds: 'rushing_yards',
-  player_rush_attempts: 'carries',
   player_reception_yds: 'receiving_yards',
   player_receptions: 'receptions',
+  player_rush_attempts: 'carries',
+  player_pass_completions: 'completions',
+  player_pass_attempts: 'attempts',
 };
+const MIN_MARKETS = 3;
 const BOOK = 'hardrockbet';
 const WINDOW_H = +(process.env.PROPS_WINDOW_HOURS || 3);
 const RESERVE = 25; // stop pulling when this few credits remain
@@ -65,12 +69,20 @@ if (isMain) {
   if (!res.ok) { console.log(`props: events request failed (HTTP ${res.status}), skipping`); process.exit(0); }
   let remaining = +(res.headers.get('x-requests-remaining') ?? NaN);
   const events = await res.json();
-  const cost = Object.keys(MARKETS).length;
+  // Spread this month's credits over the games still to come this month (credits reset monthly), so the plan uses
+  // the whole allowance instead of a fixed number of markets. The reserve is never touched.
+  const ym = t => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit' }).format(t);
+  const thisMonth = ym(now);
+  const gamesLeft = games.filter(g => !g.done && kickoff(g) > now && ym(kickoff(g)) === thisMonth && !fs.existsSync(path.join(dir, `${g.game_id}.json`))).length || due.length;
+  const perGame = Number.isFinite(remaining) ? Math.floor((remaining - RESERVE) / gamesLeft) : MIN_MARKETS;
+  const markets = Object.keys(MARKETS).slice(0, Math.max(MIN_MARKETS, Math.min(Object.keys(MARKETS).length, perGame)));
+  const cost = markets.length;
+  console.log(`props: ${remaining} credits left, ${gamesLeft} games left this month -> ${cost} markets per game`);
   for (const g of due) {
     if (Number.isFinite(remaining) && remaining - cost < RESERVE) { console.log(`props: ${remaining} credits left, keeping ${RESERVE} in reserve; skipping ${g.game_id}`); break; }
     const ev = events.find(e => TEAMS[e.home_team] === g.home && TEAMS[e.away_team] === g.away);
     if (!ev) { console.log(`props: ${g.game_id} not listed by the API yet`); continue; }
-    const r = await fetch(`${base}/events/${ev.id}/odds?apiKey=${key}&bookmakers=${BOOK}&markets=${Object.keys(MARKETS).join(',')}&oddsFormat=american`);
+    const r = await fetch(`${base}/events/${ev.id}/odds?apiKey=${key}&bookmakers=${BOOK}&markets=${markets.join(',')}&oddsFormat=american`);
     remaining = +(r.headers.get('x-requests-remaining') ?? remaining);
     if (!r.ok) { console.log(`props: ${g.game_id} odds request failed (HTTP ${r.status})`); continue; }
     const body = await r.json();
