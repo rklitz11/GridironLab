@@ -29,3 +29,10 @@ export const SOURCES = {
   pfrRush: s => [`${REL}/pfr_advstats/advstats_week_rush_${s}.csv`, `advstats_week_rush_${s}.csv`],
   pfrRec: s => [`${REL}/pfr_advstats/advstats_week_rec_${s}.csv`, `advstats_week_rec_${s}.csv`],
 };
+
+// Best TD chances (and Hard Rock anytime-TD pulls) cover Sunday and Monday games, plus any games listed here.
+export const TD_EXTRA_GAMES = new Set([
+  // Week 12 (Thanksgiving week)
+  '2026_12_GB_LA', '2026_12_CHI_DET', '2026_12_PHI_DAL', '2026_12_KC_BUF', '2026_12_DEN_PIT',
+]);
+export const isTdGame = g => ['Sunday', 'Monday'].includes(g.weekday) || TD_EXTRA_GAMES.has(g.game_id);

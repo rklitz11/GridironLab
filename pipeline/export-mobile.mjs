@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { OUT } from './lib/config.mjs';
 import { loadPlayers, calibRows, buildCalib, buildPicks, valueLines, normName, STATS, MIN_EDGE, MAX_EDGE } from './lib/picks.mjs';
-import { CACHE } from './lib/config.mjs';
+import { CACHE, isTdGame, TD_EXTRA_GAMES } from './lib/config.mjs';
 
 const meta = JSON.parse(fs.readFileSync(path.join(OUT, 'meta.json'), 'utf8'));
 const season = +(process.argv[2] || meta.next_week.season);
@@ -138,7 +138,7 @@ function valueBlock(g) {
 // P(at least one) = 1 - exp(-(projected rush TDs + rec TDs)); back-tested in pipeline/experiments/td-exp.mjs.
 const implied = a => (a < 0 ? -a / (-a + 100) : 100 / (a + 100));
 function tdBlock(w) {
-  const games = allGames.filter(g => g.week === w && ['Sunday', 'Monday'].includes(g.weekday));
+  const games = allGames.filter(g => g.week === w && isTdGame(g));
   const rows = [];
   for (const g of games) {
     let sheet = [];
@@ -157,7 +157,7 @@ function tdBlock(w) {
   const top = rows.sort((a, b) => b.p - a.p).slice(0, 10);
   const graded = top.filter(x => x.scored != null);
   const tdLine = x => [x.rush >= 0.05 ? `${f1(x.rush)} rush` : '', x.rec >= 0.05 ? `${f1(x.rec)} rec` : ''].filter(Boolean).join(' + ');
-  return `<section class="tdbox"><h3>Best TD chances <span>Sunday and Monday games</span></h3><ol>${top.map(x => {
+  return `<section class="tdbox"><h3>Best TD chances <span>${games.some(g => TD_EXTRA_GAMES.has(g.game_id)) ? 'all games this week' : 'Sunday and Monday games'}</span></h3><ol>${top.map(x => {
     const opp = x.r.team === x.g.home ? `vs ${x.g.away}` : `@ ${x.g.home}`;
     const hr = x.hr != null ? ` · Hard Rock ${x.hr > 0 ? '+' : ''}${x.hr} (${Math.round(implied(x.hr) * 100)}%)` : '';
     const res = x.scored == null ? `${Math.round(x.p * 100)}%` : x.scored ? `<span class="up">${x.scored} TD</span>` : '<span class="down">No TD</span>';

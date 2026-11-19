@@ -23,7 +23,7 @@ Each game card lists the model's 3–5 most confident player calls. A call is OV
 
 ### Best TD chances
 
-Each week opens with the 10 players most likely to score a rushing or receiving TD in that week's Sunday and Monday games. The chance of at least one is `1 - exp(-(projected rush TDs + rec TDs))`. It's well calibrated: in 2025–26 games the model hadn't seen, weekly top-10 lists were claimed at about 53% and scored 53% (2025) and 64% (2026). Players with an injury tag, or who missed their team's last game, are left out. When Hard Rock's anytime-TD price was pulled (Sunday and Monday games only), it's shown next to the model's number. Finished weeks show who scored. Re-run the check with `node pipeline/experiments/td-exp.mjs`.
+Each week opens with the 10 players most likely to score a rushing or receiving TD in that week's Sunday and Monday games, plus any games listed in `TD_EXTRA_GAMES` in `pipeline/lib/config.mjs` (Thanksgiving week's Wednesday–Friday games are). The chance of at least one is `1 - exp(-(projected rush TDs + rec TDs))`. It's well calibrated: in 2025–26 games the model hadn't seen, weekly top-10 lists were claimed at about 53% and scored 53% (2025) and 64% (2026). Players with an injury tag, or who missed their team's last game, are left out. When Hard Rock's anytime-TD price was pulled (Sunday and Monday games only), it's shown next to the model's number. Finished weeks show who scored. Re-run the check with `node pipeline/experiments/td-exp.mjs`.
 
 ### Value vs Hard Rock
 

@@ -5,7 +5,7 @@
 // Usage: node pipeline/props.mjs [--game 2026_11_IND_HOU]   (--game pulls that game now, ignoring the window)
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, CACHE } from './lib/config.mjs';
+import { ROOT, CACHE, isTdGame } from './lib/config.mjs';
 
 // In priority order: each pull takes as many as the month's credit budget allows (1 credit per market per game).
 export const MARKETS = {
@@ -13,7 +13,7 @@ export const MARKETS = {
   player_rush_yds: 'rushing_yards',
   player_reception_yds: 'receiving_yards',
   player_receptions: 'receptions',
-  player_anytime_td: 'anytime_td', // Sunday and Monday games only (feeds the weekly Best TD chances list)
+  player_anytime_td: 'anytime_td', // Best TD chances games only (Sunday/Monday plus TD_EXTRA_GAMES)
   player_rush_attempts: 'carries',
   player_pass_completions: 'completions',
   player_pass_attempts: 'attempts',
@@ -77,7 +77,7 @@ if (isMain) {
   const gamesLeft = games.filter(g => !g.done && kickoff(g) > now && ym(kickoff(g)) === thisMonth && !fs.existsSync(path.join(dir, `${g.game_id}.json`))).length || due.length;
   const perGame = Number.isFinite(remaining) ? Math.floor((remaining - RESERVE) / gamesLeft) : MIN_MARKETS;
   const nMarkets = Math.max(MIN_MARKETS, Math.min(Object.keys(MARKETS).length, perGame));
-  const marketsFor = g => Object.keys(MARKETS).filter(m => m !== 'player_anytime_td' || ['Sunday', 'Monday'].includes(g.weekday)).slice(0, nMarkets);
+  const marketsFor = g => Object.keys(MARKETS).filter(m => m !== 'player_anytime_td' || isTdGame(g)).slice(0, nMarkets);
   console.log(`props: ${remaining} credits left, ${gamesLeft} games left this month -> ${nMarkets} markets per game`);
   for (const g of due) {
     const markets = marketsFor(g), cost = markets.length;
