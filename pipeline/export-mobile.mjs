@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { OUT } from './lib/config.mjs';
+import { loadPlayers, calibRows, buildCalib, buildPicks } from './lib/picks.mjs';
 
 const meta = JSON.parse(fs.readFileSync(path.join(OUT, 'meta.json'), 'utf8'));
 const season = +(process.argv[2] || meta.next_week.season);
@@ -22,6 +23,14 @@ const slug = g => `w${g.week}-${g.away}-${g.home}`.toLowerCase();
 const weeks = [...new Set(allGames.map(g => g.week))].sort((a, b) => a - b);
 const upcoming = allGames.filter(g => !g.done);
 const currentWeek = upcoming.length ? upcoming[0].week : weeks.at(-1);
+
+// Confident calls: OVER/UNDER a player's season average where the model is most sure (see pipeline/lib/picks.mjs).
+// PICK_SCOPE 'next' shows them only on the next game day's games; 'all' shows every upcoming game.
+const PICK_SCOPE = process.env.PICK_SCOPE || 'next';
+const nextDay = upcoming.length ? upcoming[0].gameday : null;
+const players = loadPlayers(path.join(OUT, 'players'));
+const liveCalib = buildCalib(calibRows(players, meta.test_from));
+const picks = buildPicks(players, liveCalib, season, g => !g.stats && (PICK_SCOPE === 'all' || g.gameday === nextDay));
 const kick = g => {
   const d = new Date(`${g.gameday}T12:00:00`);
   const day = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -80,6 +89,16 @@ function teamBlock(g, side) {
     ${outLine}</section>`;
 }
 
+function picksBlock(list) {
+  if (!list?.length) return '';
+  const fmt = (k, v) => (k === 'fantasy_points_ppr' || k === 'receptions' || k === 'carries' || k === 'completions' ? f1(v) : f0(v));
+  return `<div class="picks"><h4>Confident calls</h4><ul>${list.map(c => `<li>
+    <span class="dir ${c.over ? 'over' : 'under'}">${c.over ? 'Over' : 'Under'}</span>
+    <span class="what"><b>${esc(c.name)}</b> <span class="pos">${c.pos}</span> ${c.line} ${c.label}
+      <span class="why">avg ${fmt(c.k, c.avg)} in ${c.games} games · proj ${fmt(c.k, c.proj)}</span></span>
+    <span class="conf">${Math.round(c.conf * 100)}%</span></li>`).join('')}</ul></div>`;
+}
+
 function gameCard(g) {
   const p = g.pred || {};
   const { day, t } = kick(g);
@@ -108,6 +127,7 @@ function gameCard(g) {
       <div><em>Win</em><b>${wp == null ? '–' : wp >= 0.5 ? `${g.home} ${pct(wp)}` : `${g.away} ${pct(1 - wp)}`}</b><span>ML ${g.home_ml != null ? `${g.home} ${sgn(g.home_ml)}` : '–'}</span></div>
     </div>
     <div class="ctx"><span>${esc(wx)}</span>${lean}<span class="chev" aria-hidden="true"></span></div>
+    ${picksBlock(picks[g.game_id])}
   </summary>
   <div class="body">${qbs}${teamBlock(g, 'home')}${teamBlock(g, 'away')}</div>
 </details>`;
@@ -187,6 +207,16 @@ td.ppr { font: 600 18px/1.1 var(--display); width: 112px; padding-left: 10px; }
 .rg b { position: absolute; top: 0; width: 3px; height: 10px; margin-left: -1px; border-radius: 1px; background: var(--turf); }
 .out { margin: 6px 0 0; font-size: 12px; color: var(--fg2); }
 footer { font-size: 12px; color: var(--muted); }
+.picks { border-top: 1px dashed var(--line); padding-top: 8px; }
+.picks h4 { margin: 0 0 4px; font: 700 12px/1 var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--turf); }
+.picks ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.picks li { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+.picks .dir { font: 700 11px/1 var(--body); text-transform: uppercase; letter-spacing: .06em; text-align: center; border-radius: 5px; padding: 4px 0; }
+.picks .dir.over { background: var(--turf); color: var(--card); }
+.picks .dir.under { border: 1px solid var(--fg2); color: var(--fg); }
+.picks .what { font-size: 13px; min-width: 0; }
+.picks .why { display: block; font-size: 11px; color: var(--muted); }
+.picks .conf { font: 700 18px/1 var(--display); }
 .weeks { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .weeks::-webkit-scrollbar { display: none; }
 .weeks a { flex: none; min-width: 44px; text-align: center; font: 700 15px/1 var(--display); color: var(--fg2); text-decoration: none; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 9px 10px; }
@@ -225,7 +255,7 @@ ${weeks.map(w => {
   ${cards}
 </section>`;
 }).join('')}
-<footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable.</footer>
+<footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable. Confident calls compare the projection with the player's season average (3+ games); the percentage is the chance of the call hitting, from how projections like it played out in 2025–26 games the model had not seen. In that back-test the top 4 calls per game hit about 78%.</footer>
 </div>
 <script>
 // Week tabs: #w12 shows week 12, #w12-kc-buf shows week 12 and opens that game; no hash shows the current week.

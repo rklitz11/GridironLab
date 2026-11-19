@@ -216,16 +216,19 @@ let synthesized = 0;
 for (const g of games) {
   if (g.done || g.season !== CUR) continue;
   for (const team of [g.home, g.away]) {
-    if (reported.has(`${g.season}|${g.week}|${team}`)) continue;
+    // IR, released and practice-squad players never appear on the official report, so the roster rule always applies;
+    // carrying last week's Out/Doubtful forward only happens until the week's report is out
+    const hasReport = reported.has(`${g.season}|${g.week}|${team}`);
     let lastWk = 0;
     for (let w = g.week - 1; w >= 1; w--) if (reported.has(`${g.season}|${w}|${team}`)) { lastWk = w; break; }
     for (const [gsis, r] of Object.entries(rosterNow)) {
       if (r.team !== team) continue;
       const key = `${g.season}|${g.week}|${gsis}`;
-      if (ROSTER_OUT[r.status] && !(depthOf[gsis]?.team === team && r.status === 'DEV')) {
+      if (ROSTER_OUT[r.status] && !(depthOf[gsis]?.team === team && r.status === 'DEV') && !(hasReport && injuries[key])) {
         injuries[key] = { status: 'Out', injury: ROSTER_OUT[r.status], practice: null, synthetic: true }; synthesized++;
         continue;
       }
+      if (hasReport) continue;
       const prev = lastWk ? injuries[`${g.season}|${lastWk}|${gsis}`] : null;
       if (prev && (prev.status === 'Out' || prev.status === 'Doubtful')) {
         injuries[key] = { status: 'Questionable', injury: `${prev.injury || 'injury'}; ${prev.status} Wk ${lastWk}`, practice: null, synthetic: true }; synthesized++;
