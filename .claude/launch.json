@@ -1,6 +1,22 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "gridiron-lab", "runtimeExecutable": "node", "runtimeArgs": ["server.mjs"], "port": 5173 }
+    {
+      "name": "gridiron-lab",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "server.mjs"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "mobile-page",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const h=require('http'),f=require('fs'),p=require('path'),r=p.resolve('data/out/mobile');h.createServer((q,s)=>{let u=decodeURIComponent(q.url.split('?')[0]);if(u==='/')u='/week.html';const x=p.join(r,u);if(!x.startsWith(r))return s.writeHead(403).end();f.readFile(x,(e,b)=>e?s.writeHead(404).end():s.writeHead(200,{'content-type':'text/html; charset=utf-8'}).end(b))}).listen(5180)"
+      ],
+      "port": 5180
+    }
   ]
 }

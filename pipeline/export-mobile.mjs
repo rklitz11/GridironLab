@@ -46,7 +46,7 @@ for (const g of allGames) {
   let sheet = [];
   try { sheet = JSON.parse(fs.readFileSync(path.join(OUT, 'games', `${g.game_id}.json`), 'utf8')); } catch {}
   const all = valueLines(props, sheet, liveCalib, r => playedLast(r.gsis, r.team, g.gameday));
-  const v = { fetched: props.fetched_at, plays: all.filter(x => x.edge >= MIN_EDGE && x.edge <= MAX_EDGE).slice(0, 3), big: all.filter(x => x.edge > MAX_EDGE).slice(0, 2) };
+  const v = { fetched: props.fetched_at, all, plays: all.filter(x => x.edge >= MIN_EDGE && x.edge <= MAX_EDGE).slice(0, 3), big: all.filter(x => x.edge > MAX_EDGE).slice(0, 2) };
   for (const [k, list] of [['value', v.plays], ['big', v.big]]) for (const x of list) if (x.hit != null) record[k][x.hit ? 0 : 1]++;
   value[g.game_id] = v;
 }
@@ -108,14 +108,27 @@ function teamBlock(g, side) {
     ${outLine}</section>`;
 }
 
-function picksBlock(list) {
+function picksBlock(list, g) {
   if (!list?.length) return '';
   const fmt = (k, v) => (k === 'fantasy_points_ppr' || k === 'receptions' || k === 'carries' || k === 'completions' ? f1(v) : f0(v));
+  // Hard Rock's line on the same player and stat, when it was pulled: the model's chance at the book's number,
+  // the book's fair chance (vig removed) and the gap. The side is whichever the model prefers at that number.
+  const v = value[g.game_id];
+  const hr = c => {
+    const x = v?.all.find(y => y.stat === c.k && normName(y.name) === normName(c.name));
+    if (!x) return '';
+    const gap = Math.round(x.edge * 100);
+    const cls = x.edge >= MIN_EDGE && x.edge <= MAX_EDGE ? 'hr good' : x.edge > MAX_EDGE ? 'hr big' : 'hr';
+    const res = x.hit == null ? '' : x.hit ? ' · <span class="up">Hit</span>' : ' · <span class="down">Miss</span>';
+    return `<span class="${cls}">Hard Rock ${x.over ? 'O' : 'U'} ${x.line} (${x.price > 0 ? '+' : ''}${x.price}) · model ${Math.round(x.model * 100)}% vs ${Math.round(x.book * 100)}% · ${gap >= 0 ? '+' : ''}${gap}${x.edge > MAX_EDGE ? ' big gap' : ''}${res}</span>`;
+  };
+  const note = v ? `<p class="vnote">Green Hard Rock rows are 5–12 point gaps (model minus book, vig removed); the side shown is the model's pick at Hard Rock's number.</p>`
+    : `<p class="vnote">Hard Rock lines are added about 45 minutes before kickoff.</p>`;
   return `<div class="picks"><h4>Confident calls</h4><ul>${list.map(c => `<li>
     <span class="dir ${c.over ? 'over' : 'under'}">${c.over ? 'Over' : 'Under'}</span>
     <span class="what"><b>${esc(c.name)}</b> <span class="pos">${c.pos}</span> ${c.line} ${c.label}
-      <span class="why">avg ${fmt(c.k, c.avg)} in ${c.games} games · proj ${fmt(c.k, c.proj)}</span></span>
-    <span class="conf">${Math.round(c.conf * 100)}%</span></li>`).join('')}</ul></div>`;
+      <span class="why">avg ${fmt(c.k, c.avg)} in ${c.games} games · proj ${fmt(c.k, c.proj)}</span>${hr(c)}</span>
+    <span class="conf">${Math.round(c.conf * 100)}%</span></li>`).join('')}</ul>${note}</div>`;
 }
 
 function valueBlock(g) {
@@ -195,7 +208,7 @@ function gameCard(g) {
       <div><em>Win</em><b>${wp == null ? '–' : wp >= 0.5 ? `${g.home} ${pct(wp)}` : `${g.away} ${pct(1 - wp)}`}</b><span>ML ${g.home_ml != null ? `${g.home} ${sgn(g.home_ml)}` : '–'}</span></div>
     </div>
     <div class="ctx"><span>${esc(wx)}</span>${lean}<span class="chev" aria-hidden="true"></span></div>
-    ${picksBlock(picks[g.game_id])}
+    ${picksBlock(picks[g.game_id], g)}
     ${valueBlock(g)}
   </summary>
   <div class="body">${qbs}${teamBlock(g, 'home')}${teamBlock(g, 'away')}</div>
@@ -307,6 +320,9 @@ footer { font-size: 12px; color: var(--muted); }
 .picks .why { display: block; font-size: 11px; color: var(--muted); }
 .picks .conf { font: 700 18px/1 var(--display); }
 .picks.value h4 { color: var(--fg2); }
+.picks .hr { display: block; font-size: 11px; color: var(--fg2); margin-top: 2px; }
+.picks .hr.good { color: var(--turf); font-weight: 700; }
+.picks .hr.big { color: var(--muted); }
 .vsub { margin: 8px 0 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--warn); }
 .vnote { margin: 6px 0 0; font-size: 11px; color: var(--muted); }
 .record { font-size: 12px; color: var(--fg2); }

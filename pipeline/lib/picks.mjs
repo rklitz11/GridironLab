@@ -68,9 +68,10 @@ export function calibRows(players, fromSeason, toSeason = Infinity) {
 
 /**
  * Picks for every player-game in `season` that `want(game)` accepts: each player's most confident OVER/UNDER against
- * his season-to-date average (3+ games), then the top 3-5 per game. Players listed with an injury are skipped,
+ * his season-to-date average (3+ games), then every call of 60%+ per game, up to 10 (at least the top 3). Players listed with an injury are skipped,
  * since a pick on them is really a bet on whether they play.
  */
+export const MAX_CALLS = 10;
 export function buildPicks(players, calib, season, want, eligible = () => true) {
   const byGame = {};
   for (const p of players) {
@@ -99,7 +100,7 @@ export function buildPicks(players, calib, season, want, eligible = () => true) 
   for (const [id, list] of Object.entries(byGame)) {
     list.sort((a, b) => b.conf - a.conf);
     const strong = list.filter(c => c.conf >= 0.6);
-    byGame[id] = (strong.length >= 3 ? strong : list).slice(0, 5);
+    byGame[id] = (strong.length >= 3 ? strong : list).slice(0, MAX_CALLS);
   }
   return byGame;
 }
