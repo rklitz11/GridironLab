@@ -133,6 +133,25 @@ function gameCard(g) {
 </details>`;
 }
 
+// Each week's cards go in their own file (weeks/wN.html) that the page fetches when the week is opened. That keeps
+// the page itself small, which the publish step needs: it has to read the live page in full before replacing it.
+const fragments = {};
+for (const w of weeks) {
+  const games = allGames.filter(g => g.week === w);
+  const nDone = games.filter(g => g.done).length;
+  const status = nDone === games.length ? 'Final results vs projections' : nDone ? `${nDone} of ${games.length} games final` : `${games.length} games`;
+  let lastDay = '', cards = '';
+  for (const g of games) {
+    const { day } = kick(g);
+    if (day !== lastDay) { cards += `<h3 class="day">${day}</h3>`; lastDay = day; }
+    cards += gameCard(g);
+  }
+  fragments[w] = `<div class="wk-head"><h2>Week ${w}${w === currentWeek ? ' <span>this week</span>' : ''}</h2><p>${status}</p></div>
+<nav class="jump" aria-label="Jump to game">${games.map(g => `<a href="#${slug(g)}">${g.away}@${g.home}</a>`).join('')}</nav>
+${cards}`;
+}
+const VERSION = Date.now().toString(36);
+
 const stamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const html = `<title>Gridiron Lab Weekly</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -239,42 +258,38 @@ footer { font-size: 12px; color: var(--muted); }
   <p>${season} season · updated ${esc(stamp)} ET · tap a game for player projections</p>
 </header>
 <nav class="weeks" aria-label="Choose week">${weeks.map(w => `<a href="#w${w}" data-w="${w}" class="${w === currentWeek ? 'cur' : ''}">${w}</a>`).join('')}</nav>
-${weeks.map(w => {
-  const games = allGames.filter(g => g.week === w);
-  const nDone = games.filter(g => g.done).length;
-  const status = nDone === games.length ? 'Final results vs projections' : nDone ? `${nDone} of ${games.length} games final` : `${games.length} games`;
-  let lastDay = '', cards = '';
-  for (const g of games) {
-    const { day } = kick(g);
-    if (day !== lastDay) { cards += `<h3 class="day">${day}</h3>`; lastDay = day; }
-    cards += gameCard(g);
-  }
-  return `<section class="week" id="w${w}" data-w="${w}"${w === currentWeek ? '' : ' hidden'}>
-  <div class="wk-head"><h2>Week ${w}${w === currentWeek ? ' <span>this week</span>' : ''}</h2><p>${status}</p></div>
-  <nav class="jump" aria-label="Jump to game">${games.map(g => `<a href="#${slug(g)}">${g.away}@${g.home}</a>`).join('')}</nav>
-  ${cards}
-</section>`;
-}).join('')}
+${weeks.map(w => `<section class="week" id="w${w}" data-w="${w}" hidden><p class="muted">Loading Week ${w}…</p></section>`).join('')}
 <footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable. Confident calls compare the projection with the player's season average (3+ games); the percentage is the chance of the call hitting, from how projections like it played out in 2025–26 games the model had not seen. In that back-test the top 4 calls per game hit about 78%.</footer>
 </div>
 <script>
 // Week tabs: #w12 shows week 12, #w12-kc-buf shows week 12 and opens that game; no hash shows the current week.
-const CURRENT = ${currentWeek};
+const CURRENT = ${currentWeek}, VERSION = '${VERSION}';
+function load(s) {
+  if (s.dataset.loaded) return Promise.resolve();
+  s.dataset.loaded = '1';
+  return fetch('weeks/w' + s.dataset.w + '.html?v=' + VERSION)
+    .then(r => (r.ok ? r.text() : Promise.reject(r.status)))
+    .then(t => { s.innerHTML = t; })
+    .catch(() => { delete s.dataset.loaded; s.innerHTML = '<p class="muted">Week ' + s.dataset.w + ' didn\u2019t load. Check your connection and tap the week again.</p>'; });
+}
 function showWeek(w) {
-  document.querySelectorAll('section.week').forEach(s => { s.hidden = +s.dataset.w !== w; });
+  let shown = null;
+  document.querySelectorAll('section.week').forEach(s => { s.hidden = +s.dataset.w !== w; if (!s.hidden) shown = s; });
   document.querySelectorAll('.weeks a').forEach(a => {
     const on = +a.dataset.w === w;
     a.classList.toggle('on', on);
     if (on) { a.setAttribute('aria-current', 'page'); a.scrollIntoView({ block: 'nearest', inline: 'center' }); } else a.removeAttribute('aria-current');
   });
+  return shown ? load(shown) : Promise.resolve();
 }
 function route() {
   const id = decodeURIComponent(location.hash.slice(1));
   const m = /^w([0-9]+)/.exec(id);
-  const el = id && document.getElementById(id);
-  showWeek(m && document.getElementById('w' + m[1]) ? +m[1] : CURRENT);
-  if (el && el.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({ block: 'start' }); }
-  else if (m) window.scrollTo(0, 0);
+  showWeek(m && document.getElementById('w' + m[1]) ? +m[1] : CURRENT).then(() => {
+    const el = id && document.getElementById(id);
+    if (el && el.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({ block: 'start' }); }
+    else if (m) window.scrollTo(0, 0);
+  });
 }
 window.addEventListener('hashchange', route);
 route();
@@ -282,5 +297,8 @@ route();
 `;
 const dir = path.join(OUT, 'mobile');
 fs.mkdirSync(dir, { recursive: true });
+fs.rmSync(path.join(dir, 'weeks'), { recursive: true, force: true });
+fs.mkdirSync(path.join(dir, 'weeks'), { recursive: true });
+for (const [w, frag] of Object.entries(fragments)) fs.writeFileSync(path.join(dir, 'weeks', `w${w}.html`), frag);
 fs.writeFileSync(path.join(dir, 'week.html'), html);
-console.log(`wrote data/out/mobile/week.html (${allGames.length} games, weeks ${weeks[0]}-${weeks.at(-1)}, opens on week ${currentWeek}, ${(html.length / 1024).toFixed(0)} KB)`);
+console.log(`wrote data/out/mobile/week.html (${allGames.length} games, weeks ${weeks[0]}-${weeks.at(-1)}, opens on week ${currentWeek}, page ${(html.length / 1024).toFixed(0)} KB + ${weeks.length} week files)`);
