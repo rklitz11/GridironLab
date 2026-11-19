@@ -105,7 +105,7 @@ export function buildPicks(players, calib, season, want, eligible = () => true) 
 }
 
 // ---------------------------------------------------------------- value vs a sportsbook
-const normName = s => String(s || '').toLowerCase().replace(/[.'’-]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/\s+/g, ' ').trim();
+export const normName = s => String(s || '').toLowerCase().replace(/[.'’-]/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b/g, '').replace(/\s+/g, ' ').trim();
 const implied = a => (a < 0 ? -a / (-a + 100) : 100 / (a + 100));
 export const MIN_EDGE = 0.05;
 // Gaps bigger than this were, in practice, the model missing news the market has (a back returning from injury,

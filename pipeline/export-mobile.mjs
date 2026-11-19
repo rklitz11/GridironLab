@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { OUT } from './lib/config.mjs';
-import { loadPlayers, calibRows, buildCalib, buildPicks, valueLines, STATS, MIN_EDGE, MAX_EDGE } from './lib/picks.mjs';
+import { loadPlayers, calibRows, buildCalib, buildPicks, valueLines, normName, STATS, MIN_EDGE, MAX_EDGE } from './lib/picks.mjs';
 import { CACHE } from './lib/config.mjs';
 
 const meta = JSON.parse(fs.readFileSync(path.join(OUT, 'meta.json'), 'utf8'));
@@ -134,6 +134,39 @@ function valueBlock(g) {
   <p class="vnote">Lines from ${when} ET. Numbers on the right are model minus Hard Rock, in percentage points, with the vig removed.</p></div>`;
 }
 
+// Best TD chances: the week's 10 players most likely to score a rushing or receiving TD in Sunday and Monday games.
+// P(at least one) = 1 - exp(-(projected rush TDs + rec TDs)); back-tested in pipeline/experiments/td-exp.mjs.
+const implied = a => (a < 0 ? -a / (-a + 100) : 100 / (a + 100));
+function tdBlock(w) {
+  const games = allGames.filter(g => g.week === w && ['Sunday', 'Monday'].includes(g.weekday));
+  const rows = [];
+  for (const g of games) {
+    let sheet = [];
+    try { sheet = JSON.parse(fs.readFileSync(path.join(OUT, 'games', `${g.game_id}.json`), 'utf8')); } catch {}
+    const f = path.join(CACHE, 'props', `${g.game_id}.json`);
+    const td = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')).td || [] : [];
+    for (const r of sheet) {
+      if (!r.proj || (!g.done && r.injury) || !playedLast(r.gsis, r.team, g.gameday)) continue;
+      const rush = r.proj.rushing_tds || 0, rec = r.proj.receiving_tds || 0;
+      const hr = td.find(t => normName(t.player) === normName(r.name));
+      const scored = r.stats ? (r.stats.rushing_tds || 0) + (r.stats.receiving_tds || 0) : null;
+      rows.push({ r, g, rush, rec, p: 1 - Math.exp(-(rush + rec)), hr: hr?.price, scored });
+    }
+  }
+  if (!rows.length) return '';
+  const top = rows.sort((a, b) => b.p - a.p).slice(0, 10);
+  const graded = top.filter(x => x.scored != null);
+  const tdLine = x => [x.rush >= 0.05 ? `${f1(x.rush)} rush` : '', x.rec >= 0.05 ? `${f1(x.rec)} rec` : ''].filter(Boolean).join(' + ');
+  return `<section class="tdbox"><h3>Best TD chances <span>Sunday and Monday games</span></h3><ol>${top.map(x => {
+    const opp = x.r.team === x.g.home ? `vs ${x.g.away}` : `@ ${x.g.home}`;
+    const hr = x.hr != null ? ` · Hard Rock ${x.hr > 0 ? '+' : ''}${x.hr} (${Math.round(implied(x.hr) * 100)}%)` : '';
+    const res = x.scored == null ? `${Math.round(x.p * 100)}%` : x.scored ? `<span class="up">${x.scored} TD</span>` : '<span class="down">No TD</span>';
+    return `<li><span class="what"><b>${esc(x.r.name)}</b> <span class="pos">${x.r.pos}</span> ${x.r.team} ${opp}
+      <span class="why">proj ${tdLine(x)} TD${hr}${x.scored != null ? ` · model ${Math.round(x.p * 100)}%` : ''}</span></span><span class="conf">${res}</span></li>`;
+  }).join('')}</ol>
+  <p class="vnote">${graded.length === top.length ? `${graded.filter(x => x.scored).length} of 10 scored. ` : ''}Chance of at least one rushing or receiving TD. In 2025–26 games the model hadn't seen, weekly top-10 lists were claimed at about 53% and scored 53–64% of the time.${top.some(x => x.hr != null) ? " Hard Rock's percentage includes its vig." : ''}</p></section>`;
+}
+
 function gameCard(g) {
   const p = g.pred || {};
   const { day, t } = kick(g);
@@ -184,6 +217,7 @@ for (const w of weeks) {
   }
   fragments[w] = `<div class="wk-head"><h2>Week ${w}${w === currentWeek ? ' <span>this week</span>' : ''}</h2><p>${status}</p></div>
 <nav class="jump" aria-label="Jump to game">${games.map(g => `<a href="#${slug(g)}">${g.away}@${g.home}</a>`).join('')}</nav>
+${tdBlock(w)}
 ${cards}`;
 }
 const VERSION = Date.now().toString(36);
@@ -276,6 +310,16 @@ footer { font-size: 12px; color: var(--muted); }
 .vsub { margin: 8px 0 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--warn); }
 .vnote { margin: 6px 0 0; font-size: 11px; color: var(--muted); }
 .record { font-size: 12px; color: var(--fg2); }
+.tdbox { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.tdbox h3 { margin: 0 0 8px; font: 700 20px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.tdbox h3 span { font: 500 11px var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.tdbox ol { margin: 0; padding-left: 22px; display: grid; gap: 7px; }
+.tdbox li::marker { font: 700 14px var(--display); color: var(--turf); }
+.tdbox li > span { display: inline; }
+.tdbox li { font-size: 13px; }
+.tdbox li .what { display: inline-block; width: calc(100% - 52px); vertical-align: top; min-width: 0; }
+.tdbox li .conf { float: right; font: 700 18px/1 var(--display); }
+.tdbox .why { display: block; font-size: 11px; color: var(--muted); }
 .weeks { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .weeks::-webkit-scrollbar { display: none; }
 .weeks a { flex: none; min-width: 44px; text-align: center; font: 700 15px/1 var(--display); color: var(--fg2); text-decoration: none; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 9px 10px; }

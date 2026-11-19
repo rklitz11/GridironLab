@@ -13,6 +13,7 @@ export const MARKETS = {
   player_rush_yds: 'rushing_yards',
   player_reception_yds: 'receiving_yards',
   player_receptions: 'receptions',
+  player_anytime_td: 'anytime_td', // Sunday and Monday games only (feeds the weekly Best TD chances list)
   player_rush_attempts: 'carries',
   player_pass_completions: 'completions',
   player_pass_attempts: 'attempts',
@@ -75,10 +76,11 @@ if (isMain) {
   const thisMonth = ym(now);
   const gamesLeft = games.filter(g => !g.done && kickoff(g) > now && ym(kickoff(g)) === thisMonth && !fs.existsSync(path.join(dir, `${g.game_id}.json`))).length || due.length;
   const perGame = Number.isFinite(remaining) ? Math.floor((remaining - RESERVE) / gamesLeft) : MIN_MARKETS;
-  const markets = Object.keys(MARKETS).slice(0, Math.max(MIN_MARKETS, Math.min(Object.keys(MARKETS).length, perGame)));
-  const cost = markets.length;
-  console.log(`props: ${remaining} credits left, ${gamesLeft} games left this month -> ${cost} markets per game`);
+  const nMarkets = Math.max(MIN_MARKETS, Math.min(Object.keys(MARKETS).length, perGame));
+  const marketsFor = g => Object.keys(MARKETS).filter(m => m !== 'player_anytime_td' || ['Sunday', 'Monday'].includes(g.weekday)).slice(0, nMarkets);
+  console.log(`props: ${remaining} credits left, ${gamesLeft} games left this month -> ${nMarkets} markets per game`);
   for (const g of due) {
+    const markets = marketsFor(g), cost = markets.length;
     if (Number.isFinite(remaining) && remaining - cost < RESERVE) { console.log(`props: ${remaining} credits left, keeping ${RESERVE} in reserve; skipping ${g.game_id}`); break; }
     const ev = events.find(e => TEAMS[e.home_team] === g.home && TEAMS[e.away_team] === g.away);
     if (!ev) { console.log(`props: ${g.game_id} not listed by the API yet`); continue; }
@@ -89,14 +91,15 @@ if (isMain) {
     const book = (body.bookmakers || []).find(b => b.key === BOOK);
     if (!book?.markets?.length) { console.log(`props: Hard Rock has no props posted for ${g.game_id} yet`); continue; }
     // one row per player line: over and under prices side by side
-    const lines = {};
+    const lines = {}, td = [];
     for (const m of book.markets) for (const o of m.outcomes) {
+      if (m.key === 'player_anytime_td') { if (o.name === 'Yes' || o.name === 'Over') td.push({ player: o.description, price: o.price }); continue; }
       const id = `${m.key}|${o.description}|${o.point}`;
       const row = (lines[id] ??= { market: m.key, stat: MARKETS[m.key], player: o.description, line: o.point });
       row[o.name === 'Over' ? 'over' : 'under'] = o.price;
     }
-    const out = { game_id: g.game_id, event_id: ev.id, book: BOOK, fetched_at: new Date().toISOString(), lines: Object.values(lines).filter(l => l.over != null && l.under != null) };
+    const out = { game_id: g.game_id, event_id: ev.id, book: BOOK, fetched_at: new Date().toISOString(), lines: Object.values(lines).filter(l => l.over != null && l.under != null), td };
     fs.writeFileSync(path.join(dir, `${g.game_id}.json`), JSON.stringify(out, null, 1));
-    console.log(`props: saved ${out.lines.length} Hard Rock lines for ${g.game_id} (${remaining} credits left this month)`);
+    console.log(`props: saved ${out.lines.length} Hard Rock lines and ${td.length} anytime-TD prices for ${g.game_id} (${remaining} credits left this month)`);
   }
 }
