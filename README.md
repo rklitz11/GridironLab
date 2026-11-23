@@ -35,6 +35,8 @@ Each line gets the model's chance from the same calibrated distribution as the c
 
 For games not yet played, the latest depth chart decides the starting QB and adds new signings or traded players (anyone in the top QB1 / RB3 / WR5 / TE3 with NFL game history). The weekly roster marks IR, released and practice-squad players as Out. Until the official injury report comes out on Wednesday, players who were Out or Doubtful the week before are carried forward as Questionable. Run `npm run update` again on Wednesday through Friday so the real report replaces these.
 
+When teammates are Out, the rushing and fantasy-point models also see each player's share re-scaled for the vacated carries and targets (`pipeline/lib/opp.mjs`). The back-test showed backs whose backfield lost 30%+ of its carries were getting about one carry too few; `node pipeline/experiments/opp-exp.mjs` compares the models with and without it.
+
 ## Pipeline
 
 | Step | File | What it does |

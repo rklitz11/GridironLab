@@ -6,6 +6,7 @@ import { Worker } from 'node:worker_threads';
 import { CACHE, OUT, CURRENT_SEASON } from './lib/config.mjs';
 import { predictRow } from './lib/gbm.mjs';
 import { trainRidge, predictRidge } from './lib/ridge.mjs';
+import { addOppFeatures, OPP_FEATS } from './lib/opp.mjs';
 
 const t0 = Date.now();
 const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`, ...a);
@@ -163,7 +164,12 @@ const PT = {
   targets: ['RB', 'WR', 'TE'], receptions: ['RB', 'WR', 'TE'], receiving_yards: ['RB', 'WR', 'TE'], receiving_tds: ['RB', 'WR', 'TE'],
   fantasy_points_ppr: ['QB', 'RB', 'WR', 'TE'],
 };
-const P_FEATS = Object.keys(playerGames[0].features).filter(k => k !== 'line_source' && k !== 'td_rate_rz');
+for (const p of playerGames) addOppFeatures(p.features);
+const P_FEATS = Object.keys(playerGames[0].features).filter(k => k !== 'line_source' && k !== 'td_rate_rz' && !OPP_FEATS.includes(k));
+// Expected-share-after-injuries features help the rushing and fantasy-point models (pipeline/experiments/opp-exp.mjs:
+// carries RMSE 2.625 -> 2.614, rushing yards and PPR slightly better) but not the receiving ones, so only those use them.
+const OPP_STATS = new Set(['carries', 'rushing_yards', 'rushing_tds', 'fantasy_points_ppr']);
+const featsFor = k => (OPP_STATS.has(k) ? [...P_FEATS, ...OPP_FEATS] : P_FEATS);
 const P_BASE = { nTrees: 1500, lr: 0.04, maxDepth: 5, minLeaf: 50, lambda: 10, subsample: 0.7, colsample: 0.5, earlyStop: 60 };
 // Count stats use a Poisson objective; yardage and fantasy points learn slower with larger leaves (both chosen on dev seasons).
 const POISSON = new Set(['carries', 'targets', 'receptions', 'passing_tds', 'rushing_tds', 'receiving_tds', 'passing_interceptions']);
@@ -176,7 +182,7 @@ const pModelsBT = {}, pModelsFinal = {};
 log('player models: early-stopping fit');
 for (const [k, pos] of Object.entries(PT)) {
   const tr = pgTrain.filter(p => pos.includes(p.pos)), va = pgVal.filter(p => pos.includes(p.pos));
-  queue(`player:${k}:es`, tr, tr.map(p => p.actual[k]), P_FEATS, optsFor(k), va, va.map(p => p.actual[k])).then(m => (pModelsBT[k] = m));
+  queue(`player:${k}:es`, tr, tr.map(p => p.actual[k]), featsFor(k), optsFor(k), va, va.map(p => p.actual[k])).then(m => (pModelsBT[k] = m));
 }
 await runQueue();
 log('player models: back-test + final fit');
@@ -184,8 +190,8 @@ for (const [k, pos] of Object.entries(PT)) {
   const nT = Math.max(50, Math.round(pModelsBT[k].bestIter * 1.1));
   const bt = pgDone.filter(p => pos.includes(p.pos) && p.season < TEST_FROM);
   const all = pgDone.filter(p => pos.includes(p.pos));
-  queue(`player:${k}:bt`, bt, bt.map(p => p.actual[k]), P_FEATS, { ...optsFor(k), nTrees: nT }).then(m => (pModelsBT[k] = m));
-  queue(`player:${k}:final`, all, all.map(p => p.actual[k]), P_FEATS, { ...optsFor(k), nTrees: nT }).then(m => (pModelsFinal[k] = m));
+  queue(`player:${k}:bt`, bt, bt.map(p => p.actual[k]), featsFor(k), { ...optsFor(k), nTrees: nT }).then(m => (pModelsBT[k] = m));
+  queue(`player:${k}:final`, all, all.map(p => p.actual[k]), featsFor(k), { ...optsFor(k), nTrees: nT }).then(m => (pModelsFinal[k] = m));
 }
 await runQueue();
 
@@ -195,11 +201,11 @@ for (const p of playerGames) {
   const useBT = p.done && p.season >= TEST_FROM;
   if (p.done && !useBT) continue;
   const models = useBT ? pModelsBT : pModelsFinal;
-  const x = vec(p, P_FEATS);
+  const x = vec(p, P_FEATS), xOpp = vec(p, featsFor('carries'));
   const o = {};
   // players already ruled Out for an upcoming game are projected at zero
   const ruledOut = !p.done && /^Out/.test(p.injury || '');
-  for (const [k, pos] of Object.entries(PT)) if (pos.includes(p.pos)) o[k] = ruledOut ? 0 : clampStat(k, predictRow(models[k], x));
+  for (const [k, pos] of Object.entries(PT)) if (pos.includes(p.pos)) o[k] = ruledOut ? 0 : clampStat(k, predictRow(models[k], OPP_STATS.has(k) ? xOpp : x));
   pPred.set(p, o);
 }
 
