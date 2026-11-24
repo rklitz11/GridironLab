@@ -1,0 +1,502 @@
+{
+ "game_id": "2026_11_CIN_WAS",
+ "event_id": "3a60ed1d20004aa4d4772b2c1a2272e7",
+ "book": "hardrockbet",
+ "fetched_at": "2026-11-24T00:26:55.221Z",
+ "lines": [
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Joe Burrow",
+   "line": 38.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Jayden Daniels",
+   "line": 31.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Joe Burrow",
+   "line": 27.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Jayden Daniels",
+   "line": 20.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Jayden Daniels",
+   "line": 222.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Joe Burrow",
+   "line": 307.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Mike Gesicki",
+   "line": 26.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Tee Higgins",
+   "line": 77.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Chase Brown",
+   "line": 28.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Stefon Diggs",
+   "line": 51.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Antonio Williams",
+   "line": 36.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Ja'Marr Chase",
+   "line": 103.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Chig Okonkwo",
+   "line": 41.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Drew Sample",
+   "line": 6.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Samaje Perine",
+   "line": 5.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Treylon Burks",
+   "line": 30.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Ben Sinnott",
+   "line": 0.5,
+   "over": 100,
+   "under": -135
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Dohnte Meyers",
+   "line": 20.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Van Jefferson",
+   "line": 6.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Rachaad White",
+   "line": 9.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Austin Ekeler",
+   "line": 7.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Jacory Croskey-Merritt",
+   "line": 3.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Chase Brown",
+   "line": 4.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Antonio Williams",
+   "line": 3.5,
+   "over": 105,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Ja'Marr Chase",
+   "line": 8.5,
+   "over": 105,
+   "under": -135
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Chig Okonkwo",
+   "line": 4.5,
+   "over": 105,
+   "under": -145
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Mike Gesicki",
+   "line": 2.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Stefon Diggs",
+   "line": 4.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Tee Higgins",
+   "line": 5.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Samaje Perine",
+   "line": 1.5,
+   "over": 155,
+   "under": -220
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Drew Sample",
+   "line": 1.5,
+   "over": 155,
+   "under": -210
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Treylon Burks",
+   "line": 2.5,
+   "over": 130,
+   "under": -170
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Ben Sinnott",
+   "line": 0.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Dohnte Meyers",
+   "line": 2.5,
+   "over": 135,
+   "under": -180
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Van Jefferson",
+   "line": 0.5,
+   "over": -170,
+   "under": 125
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Austin Ekeler",
+   "line": 1.5,
+   "over": 130,
+   "under": -170
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Rachaad White",
+   "line": 1.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Jacory Croskey-Merritt",
+   "line": 0.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Chase Brown",
+   "line": 11.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Samaje Perine",
+   "line": 5.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Jacory Croskey-Merritt",
+   "line": 9.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Joe Burrow",
+   "line": 2.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Samaje Perine",
+   "line": 20.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Joe Burrow",
+   "line": 8.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jayden Daniels",
+   "line": 42.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Chase Brown",
+   "line": 45.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Austin Ekeler",
+   "line": 11.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jacory Croskey-Merritt",
+   "line": 36.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Rachaad White",
+   "line": 19.5,
+   "over": -110,
+   "under": -120
+  }
+ ],
+ "td": [
+  {
+   "player": "Dohnte Meyers",
+   "price": 350
+  },
+  {
+   "player": "Colson Yankoff",
+   "price": 2250
+  },
+  {
+   "player": "Chase Brown",
+   "price": -130
+  },
+  {
+   "player": "Mitchell Tinsley",
+   "price": 1400
+  },
+  {
+   "player": "Antonio Williams",
+   "price": 275
+  },
+  {
+   "player": "Samaje Perine",
+   "price": 240
+  },
+  {
+   "player": "Chig Okonkwo",
+   "price": 250
+  },
+  {
+   "player": "Mike Gesicki",
+   "price": 170
+  },
+  {
+   "player": "Ja'Marr Chase",
+   "price": -165
+  },
+  {
+   "player": "Jayden Daniels",
+   "price": 240
+  },
+  {
+   "player": "Van Jefferson",
+   "price": 750
+  },
+  {
+   "player": "Austin Ekeler",
+   "price": 350
+  },
+  {
+   "player": "Stefon Diggs",
+   "price": 180
+  },
+  {
+   "player": "Tahj Brooks",
+   "price": 4000
+  },
+  {
+   "player": "Treylon Burks",
+   "price": 300
+  },
+  {
+   "player": "Jack Endries",
+   "price": 650
+  },
+  {
+   "player": "Colbie Young",
+   "price": 1400
+  },
+  {
+   "player": "John Bates",
+   "price": 1750
+  },
+  {
+   "player": "Rachaad White",
+   "price": 210
+  },
+  {
+   "player": "Joe Burrow",
+   "price": 425
+  },
+  {
+   "player": "Luke McCaffrey",
+   "price": 1750
+  },
+  {
+   "player": "Drew Sample",
+   "price": 500
+  },
+  {
+   "player": "Tee Higgins",
+   "price": -105
+  },
+  {
+   "player": "Ben Sinnott",
+   "price": 850
+  },
+  {
+   "player": "Jacory Croskey-Merritt",
+   "price": 185
+  }
+ ]
+}
