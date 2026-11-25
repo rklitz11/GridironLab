@@ -1,0 +1,482 @@
+{
+ "game_id": "2026_12_GB_LA",
+ "event_id": "5b612899d6dcdf998107f2c6c6e49a58",
+ "book": "hardrockbet",
+ "fetched_at": "2026-11-25T23:10:05.733Z",
+ "lines": [
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Matthew Stafford",
+   "line": 34.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Jordan Love",
+   "line": 36.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Jordan Love",
+   "line": 22.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Matthew Stafford",
+   "line": 22.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Matthew Stafford",
+   "line": 233.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Jordan Love",
+   "line": 264.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "CJ Daniels",
+   "line": 25.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Davis Allen",
+   "line": 11.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Tyler Higbee",
+   "line": 30.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Colby Parkinson",
+   "line": 17.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Tutu Atwell",
+   "line": 23.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Tucker Kraft",
+   "line": 36.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Konata Mumpfield",
+   "line": 34.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Blake Corum",
+   "line": 13.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Kyren Williams",
+   "line": 22.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Matthew Golden",
+   "line": 74.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Christian Watson",
+   "line": 73.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Savion Williams",
+   "line": 15.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Xavier Smith",
+   "line": 4.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Chris Brooks",
+   "line": 6.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "MarShawn Lloyd",
+   "line": 6.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Christian Watson",
+   "line": 4.5,
+   "over": -140,
+   "under": 105
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Matthew Golden",
+   "line": 5.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Tyler Higbee",
+   "line": 3.5,
+   "over": 105,
+   "under": -140
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Konata Mumpfield",
+   "line": 2.5,
+   "over": -145,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Tutu Atwell",
+   "line": 1.5,
+   "over": -145,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "CJ Daniels",
+   "line": 2.5,
+   "over": 135,
+   "under": -180
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Colby Parkinson",
+   "line": 2.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Davis Allen",
+   "line": 1.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Kyren Williams",
+   "line": 3.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Blake Corum",
+   "line": 2.5,
+   "over": 135,
+   "under": -180
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Tucker Kraft",
+   "line": 3.5,
+   "over": -160,
+   "under": 120
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Savion Williams",
+   "line": 1.5,
+   "over": -175,
+   "under": 135
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Xavier Smith",
+   "line": 0.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "MarShawn Lloyd",
+   "line": 1.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Chris Brooks",
+   "line": 1.5,
+   "over": 120,
+   "under": -150
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Kaleb Johnson",
+   "line": 9.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Blake Corum",
+   "line": 12.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Kyren Williams",
+   "line": 12.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jordan Love",
+   "line": 3.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Matthew Stafford",
+   "line": 0.5,
+   "over": 140,
+   "under": -180
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Kyren Williams",
+   "line": 53.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Blake Corum",
+   "line": 58.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Savion Williams",
+   "line": 4.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Chris Brooks",
+   "line": 6.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "MarShawn Lloyd",
+   "line": 11.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Kaleb Johnson",
+   "line": 31.5,
+   "over": -115,
+   "under": -115
+  }
+ ],
+ "td": [
+  {
+   "player": "Tucker Kraft",
+   "price": 260
+  },
+  {
+   "player": "Christian Watson",
+   "price": 165
+  },
+  {
+   "player": "Kyren Williams",
+   "price": 100
+  },
+  {
+   "player": "Konata Mumpfield",
+   "price": 400
+  },
+  {
+   "player": "Matthew Golden",
+   "price": 170
+  },
+  {
+   "player": "Tyler Higbee",
+   "price": 300
+  },
+  {
+   "player": "Blake Corum",
+   "price": 135
+  },
+  {
+   "player": "Kaleb Johnson",
+   "price": 220
+  },
+  {
+   "player": "Davis Allen",
+   "price": 650
+  },
+  {
+   "player": "Tutu Atwell",
+   "price": 500
+  },
+  {
+   "player": "Mark Redman",
+   "price": 1400
+  },
+  {
+   "player": "Ronnie Rivers",
+   "price": 2250
+  },
+  {
+   "player": "Chris Brooks",
+   "price": 475
+  },
+  {
+   "player": "Bo Melton",
+   "price": 1750
+  },
+  {
+   "player": "Colby Parkinson",
+   "price": 275
+  },
+  {
+   "player": "MarShawn Lloyd",
+   "price": 425
+  },
+  {
+   "player": "Max Klare",
+   "price": 4000
+  },
+  {
+   "player": "Xavier Smith",
+   "price": 800
+  },
+  {
+   "player": "Jordan Love",
+   "price": 1000
+  },
+  {
+   "player": "CJ Daniels",
+   "price": 450
+  },
+  {
+   "player": "Jonnu Smith",
+   "price": 1400
+  },
+  {
+   "player": "Matthew Stafford",
+   "price": 2250
+  },
+  {
+   "player": "Savion Williams",
+   "price": 475
+  },
+  {
+   "player": "Skyy Moore",
+   "price": 900
+  }
+ ]
+}
