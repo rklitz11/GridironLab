@@ -1,6 +1,6 @@
 # Refreshing the phone page (for scheduled cloud runs)
 
-The page lives at https://claude.ai/artifact/C1SVFLXgwuayYLnRwr88VR. It is a small page (`week.html`) plus one file per week (`weeks/w1.html` … `weeks/w18.html`) that it loads on demand.
+The page lives at https://claude.ai/artifact/MVbzrefY82DeRrCF6uoWkn. It is a small page (`week.html`) plus one file per week (`weeks/w1.html` … `weeks/w18.html`) that it loads on demand.
 
 1. Run `npm run update` with a 10-minute timeout. It downloads the latest nflverse data, fetches weather, builds features and trains the models (about 5–8 minutes). If it fails, read the error and retry once; if it fails again, stop and report the error.
 2. Run `npm run mobile`. It writes `data/out/mobile/week.html` and `data/out/mobile/weeks/wN.html`.
