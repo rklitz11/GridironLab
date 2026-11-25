@@ -360,7 +360,7 @@ footer { font-size: 12px; color: var(--muted); }
 </header>
 <nav class="weeks" aria-label="Choose week">${weeks.map(w => `<a href="#w${w}" data-w="${w}" class="${w === currentWeek ? 'cur' : ''}">${w}</a>`).join('')}</nav>
 ${weeks.map(w => `<section class="week" id="w${w}" data-w="${w}" hidden><p class="muted">Loading Week ${w}…</p></section>`).join('')}
-<footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable. Confident calls compare the projection with the player's season average (3+ games); the percentage is the chance of the call hitting, from how projections like it played out in 2025–26 games the model had not seen. In that back-test the top 4 calls per game hit about 78%.</footer>
+<footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable. Confident calls compare the projection with the player's season average (3+ games) on pass attempts, completions, pass yards, carries, rush yards, receptions and receiving yards; the percentage is the chance of the call hitting, from how projections like it played out in 2025–26 games the model had not seen. In that back-test the top 4 calls per game hit about 73%.</footer>
 </div>
 <script>
 // Week tabs: #w12 shows week 12, #w12-kc-buf shows week 12 and opens that game; no hash shows the current week.

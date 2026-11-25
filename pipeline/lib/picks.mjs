@@ -13,7 +13,6 @@ export const STATS = {
   carries: { pos: ['RB'], min: 8, label: 'carries' },
   receiving_yards: { pos: ['RB', 'WR', 'TE'], min: 25, label: 'rec yds' },
   receptions: { pos: ['RB', 'WR', 'TE'], min: 2.5, label: 'receptions' },
-  fantasy_points_ppr: { pos: ['QB', 'RB', 'WR', 'TE'], min: 8, label: 'PPR pts' },
 };
 
 const NB = 10;
