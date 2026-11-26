@@ -1,0 +1,482 @@
+{
+ "game_id": "2026_12_CHI_DET",
+ "event_id": "9b825e6518156008da499be041975fdd",
+ "book": "hardrockbet",
+ "fetched_at": "2026-11-26T17:13:05.635Z",
+ "lines": [
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Caleb Williams",
+   "line": 34.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Jared Goff",
+   "line": 34.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Caleb Williams",
+   "line": 21.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Jared Goff",
+   "line": 23.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Jared Goff",
+   "line": 281.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Caleb Williams",
+   "line": 265.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Luther Burden III",
+   "line": 64.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Kalif Raymond",
+   "line": 25.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "D'Andre Swift",
+   "line": 15.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Rome Odunze",
+   "line": 50.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Colston Loveland",
+   "line": 55.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Jahmyr Gibbs",
+   "line": 36.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Jameson Williams",
+   "line": 59.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Amon-Ra St. Brown",
+   "line": 83.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Isaac TeSlaa",
+   "line": 17.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Sam LaPorta",
+   "line": 48.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Kyle Monangai",
+   "line": 4.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Sam Roush",
+   "line": 7.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Zavion Thomas",
+   "line": 11.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Sione Vaki",
+   "line": 4.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Brock Wright",
+   "line": 5.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Colston Loveland",
+   "line": 5.5,
+   "over": 115,
+   "under": -155
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Jahmyr Gibbs",
+   "line": 4.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "D'Andre Swift",
+   "line": 2.5,
+   "over": 115,
+   "under": -150
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Rome Odunze",
+   "line": 3.5,
+   "over": 110,
+   "under": -140
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Kalif Raymond",
+   "line": 2.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Luther Burden III",
+   "line": 5.5,
+   "over": 120,
+   "under": -155
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Sam LaPorta",
+   "line": 4.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Amon-Ra St. Brown",
+   "line": 7.5,
+   "over": 115,
+   "under": -150
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Jameson Williams",
+   "line": 3.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Isaac TeSlaa",
+   "line": 1.5,
+   "over": 110,
+   "under": -140
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Zavion Thomas",
+   "line": 1.5,
+   "over": 150,
+   "under": -200
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Sione Vaki",
+   "line": 0.5,
+   "over": -170,
+   "under": 130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Brock Wright",
+   "line": 0.5,
+   "over": -180,
+   "under": 135
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Sam Roush",
+   "line": 0.5,
+   "over": -220,
+   "under": 160
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Kyle Monangai",
+   "line": 0.5,
+   "over": -200,
+   "under": 150
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Jahmyr Gibbs",
+   "line": 19.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Kyle Monangai",
+   "line": 8.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Caleb Williams",
+   "line": 4.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "D'Andre Swift",
+   "line": 12.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jared Goff",
+   "line": 0.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Caleb Williams",
+   "line": 22.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Kyle Monangai",
+   "line": 32.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "D'Andre Swift",
+   "line": 47.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Sione Vaki",
+   "line": 8.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jahmyr Gibbs",
+   "line": 96.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Luther Burden III",
+   "line": 0.5,
+   "over": 100,
+   "under": -130
+  }
+ ],
+ "td": [
+  {
+   "player": "Jahmyr Gibbs",
+   "price": -300
+  },
+  {
+   "player": "Amon-Ra St. Brown",
+   "price": -145
+  },
+  {
+   "player": "Jameson Williams",
+   "price": 195
+  },
+  {
+   "player": "Kyle Monangai",
+   "price": 145
+  },
+  {
+   "player": "Stephen Carlson",
+   "price": 2250
+  },
+  {
+   "player": "Sam Roush",
+   "price": 700
+  },
+  {
+   "player": "Zavion Thomas",
+   "price": 700
+  },
+  {
+   "player": "Jacob Saylors",
+   "price": 2250
+  },
+  {
+   "player": "Rome Odunze",
+   "price": 160
+  },
+  {
+   "player": "Brock Wright",
+   "price": 900
+  },
+  {
+   "player": "D'Andre Swift",
+   "price": -140
+  },
+  {
+   "player": "Kalif Raymond",
+   "price": 375
+  },
+  {
+   "player": "Colston Loveland",
+   "price": 130
+  },
+  {
+   "player": "Luther Burden III",
+   "price": 130
+  },
+  {
+   "player": "Sione Vaki",
+   "price": 500
+  },
+  {
+   "player": "Jahdae Walker",
+   "price": 2250
+  },
+  {
+   "player": "Isaac TeSlaa",
+   "price": 400
+  },
+  {
+   "player": "Tyler Conklin",
+   "price": 1400
+  },
+  {
+   "player": "Sam LaPorta",
+   "price": 180
+  },
+  {
+   "player": "Tay Martin",
+   "price": 4000
+  },
+  {
+   "player": "Caleb Williams",
+   "price": 325
+  },
+  {
+   "player": "Jared Goff",
+   "price": 1100
+  },
+  {
+   "player": "DeAndre Carter",
+   "price": 1400
+  },
+  {
+   "player": "Salvon Ahmed",
+   "price": 1100
+  }
+ ]
+}
