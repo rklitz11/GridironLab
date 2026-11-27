@@ -1,0 +1,502 @@
+{
+ "game_id": "2026_12_DEN_PIT",
+ "event_id": "44a3bcf5bd002583ddef2207a92dd977",
+ "book": "hardrockbet",
+ "fetched_at": "2026-11-27T19:12:15.417Z",
+ "lines": [
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Bo Nix",
+   "line": 31.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Mason Rudolph",
+   "line": 29.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Bo Nix",
+   "line": 19.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Mason Rudolph",
+   "line": 17.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Bo Nix",
+   "line": 203.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Mason Rudolph",
+   "line": 173.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Jonah Coleman",
+   "line": 22.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Courtland Sutton",
+   "line": 26.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Pat Bryant",
+   "line": 24.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Evan Engram",
+   "line": 22.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Troy Franklin",
+   "line": 4.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Marvin Mims Jr.",
+   "line": 9.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Jaylen Waddle",
+   "line": 45.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Jaylen Warren",
+   "line": 19.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Rico Dowdle",
+   "line": 8.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Adam Trautman",
+   "line": 4.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Pat Freiermuth",
+   "line": 21.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "DK Metcalf",
+   "line": 28.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Germie Bernard",
+   "line": 23.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Darnell Washington",
+   "line": 16.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Roman Wilson",
+   "line": 12.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Michael Pittman Jr.",
+   "line": 11.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Evan Engram",
+   "line": 2.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Pat Bryant",
+   "line": 2.5,
+   "over": 110,
+   "under": -145
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Marvin Mims Jr.",
+   "line": 1.5,
+   "over": 145,
+   "under": -195
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Jonah Coleman",
+   "line": 3.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Jaylen Waddle",
+   "line": 3.5,
+   "over": -140,
+   "under": 105
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Courtland Sutton",
+   "line": 2.5,
+   "over": -140,
+   "under": 105
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Rico Dowdle",
+   "line": 1.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Jaylen Warren",
+   "line": 2.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Troy Franklin",
+   "line": 0.5,
+   "over": -150,
+   "under": 115
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Roman Wilson",
+   "line": 1.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Pat Freiermuth",
+   "line": 2.5,
+   "over": 110,
+   "under": -140
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Darnell Washington",
+   "line": 1.5,
+   "over": -145,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Germie Bernard",
+   "line": 2.5,
+   "over": -150,
+   "under": 115
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "DK Metcalf",
+   "line": 2.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Adam Trautman",
+   "line": 0.5,
+   "over": -180,
+   "under": 135
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Michael Pittman Jr.",
+   "line": 1.5,
+   "over": 105,
+   "under": -135
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Jonah Coleman",
+   "line": 19.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Jaylen Warren",
+   "line": 14.5,
+   "over": -135,
+   "under": 105
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Rico Dowdle",
+   "line": 8.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Bo Nix",
+   "line": 3.5,
+   "over": -145,
+   "under": 110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Rico Dowdle",
+   "line": 31.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Bo Nix",
+   "line": 10.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jonah Coleman",
+   "line": 74.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jaylen Warren",
+   "line": 63.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Marvin Mims Jr.",
+   "line": 3.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Mason Rudolph",
+   "line": 6.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Tyler Badie",
+   "line": 5.5,
+   "over": -120,
+   "under": -110
+  }
+ ],
+ "td": [
+  {
+   "player": "Rico Dowdle",
+   "price": 400
+  },
+  {
+   "player": "Roman Wilson",
+   "price": 650
+  },
+  {
+   "player": "Marvin Mims Jr.",
+   "price": 850
+  },
+  {
+   "player": "Darnell Washington",
+   "price": 500
+  },
+  {
+   "player": "DK Metcalf",
+   "price": 425
+  },
+  {
+   "player": "Nate Adkins",
+   "price": 1100
+  },
+  {
+   "player": "Travis Homer",
+   "price": 7500
+  },
+  {
+   "player": "Pat Bryant",
+   "price": 450
+  },
+  {
+   "player": "Courtland Sutton",
+   "price": 350
+  },
+  {
+   "player": "Evan Engram",
+   "price": 525
+  },
+  {
+   "player": "Bo Nix",
+   "price": 425
+  },
+  {
+   "player": "Lew Nichols",
+   "price": 4000
+  },
+  {
+   "player": "Germie Bernard",
+   "price": 600
+  },
+  {
+   "player": "Jonah Coleman",
+   "price": -160
+  },
+  {
+   "player": "Adam Trautman",
+   "price": 900
+  },
+  {
+   "player": "Pat Freiermuth",
+   "price": 450
+  },
+  {
+   "player": "Troy Franklin",
+   "price": 1400
+  },
+  {
+   "player": "Jaylen Warren",
+   "price": 185
+  },
+  {
+   "player": "Jaylen Waddle",
+   "price": 350
+  },
+  {
+   "player": "Robert Tonyan",
+   "price": 4000
+  },
+  {
+   "player": "Adam Prentice",
+   "price": 2250
+  },
+  {
+   "player": "Mason Rudolph",
+   "price": 1600
+  },
+  {
+   "player": "Michael Pittman Jr.",
+   "price": 800
+  },
+  {
+   "player": "Tyler Badie",
+   "price": 1000
+  },
+  {
+   "player": "Cody Schrader",
+   "price": 2250
+  }
+ ]
+}
