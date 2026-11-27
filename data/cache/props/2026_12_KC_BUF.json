@@ -1,0 +1,466 @@
+{
+ "game_id": "2026_12_KC_BUF",
+ "event_id": "f36f518585aec40e8cb40e071c0844aa",
+ "book": "hardrockbet",
+ "fetched_at": "2026-11-27T00:27:15.525Z",
+ "lines": [
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Patrick Mahomes",
+   "line": 32.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_pass_attempts",
+   "stat": "attempts",
+   "player": "Josh Allen",
+   "line": 29.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Patrick Mahomes",
+   "line": 20.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_pass_completions",
+   "stat": "completions",
+   "player": "Josh Allen",
+   "line": 18.5,
+   "over": -125,
+   "under": -105
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Josh Allen",
+   "line": 216.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_pass_yds",
+   "stat": "passing_yards",
+   "player": "Patrick Mahomes",
+   "line": 230.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Xavier Worthy",
+   "line": 20.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "DJ Moore",
+   "line": 49.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "James Cook",
+   "line": 7.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Khalil Shakir",
+   "line": 36.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Travis Kelce",
+   "line": 45.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Rashee Rice",
+   "line": 45.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Keon Coleman",
+   "line": 21.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Ty Johnson",
+   "line": 16.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Josh Downs",
+   "line": 35.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Dalton Kincaid",
+   "line": 33.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Cyrus Allen",
+   "line": 11.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Emmett Johnson",
+   "line": 31.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Dawson Knox",
+   "line": 12.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_reception_yds",
+   "stat": "receiving_yards",
+   "player": "Noah Gray",
+   "line": 12.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Khalil Shakir",
+   "line": 3.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "James Cook",
+   "line": 1.5,
+   "over": 125,
+   "under": -165
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "DJ Moore",
+   "line": 3.5,
+   "over": -145,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Travis Kelce",
+   "line": 4.5,
+   "over": 125,
+   "under": -165
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Rashee Rice",
+   "line": 4.5,
+   "over": 100,
+   "under": -130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Xavier Worthy",
+   "line": 2.5,
+   "over": 120,
+   "under": -160
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Keon Coleman",
+   "line": 1.5,
+   "over": -175,
+   "under": 130
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Ty Johnson",
+   "line": 2.5,
+   "over": 120,
+   "under": -160
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Josh Downs",
+   "line": 3.5,
+   "over": 125,
+   "under": -165
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Dalton Kincaid",
+   "line": 3.5,
+   "over": 130,
+   "under": -175
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Cyrus Allen",
+   "line": 0.5,
+   "over": -240,
+   "under": 170
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Emmett Johnson",
+   "line": 3.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Noah Gray",
+   "line": 1.5,
+   "over": 100,
+   "under": -135
+  },
+  {
+   "market": "player_receptions",
+   "stat": "receptions",
+   "player": "Dawson Knox",
+   "line": 1.5,
+   "over": -105,
+   "under": -125
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Patrick Mahomes",
+   "line": 3.5,
+   "over": 115,
+   "under": -150
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "James Cook",
+   "line": 20.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Josh Allen",
+   "line": 7.5,
+   "over": -140,
+   "under": 110
+  },
+  {
+   "market": "player_rush_attempts",
+   "stat": "carries",
+   "player": "Emmett Johnson",
+   "line": 19.5,
+   "over": -130,
+   "under": 100
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "James Cook",
+   "line": 88.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Josh Allen",
+   "line": 39.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Patrick Mahomes",
+   "line": 13.5,
+   "over": -115,
+   "under": -115
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Ty Johnson",
+   "line": 1.5,
+   "over": -110,
+   "under": -120
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Emmett Johnson",
+   "line": 81.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Jaydn Ott",
+   "line": 5.5,
+   "over": -120,
+   "under": -110
+  },
+  {
+   "market": "player_rush_yds",
+   "stat": "rushing_yards",
+   "player": "Ray Davis",
+   "line": 3.5,
+   "over": -110,
+   "under": -120
+  }
+ ],
+ "td": [
+  {
+   "player": "Josh Downs",
+   "price": 325
+  },
+  {
+   "player": "Ray Davis",
+   "price": 1200
+  },
+  {
+   "player": "DJ Moore",
+   "price": 260
+  },
+  {
+   "player": "Ty Johnson",
+   "price": 600
+  },
+  {
+   "player": "Rashee Rice",
+   "price": 260
+  },
+  {
+   "player": "Cyrus Allen",
+   "price": 800
+  },
+  {
+   "player": "Keon Coleman",
+   "price": 450
+  },
+  {
+   "player": "Dalton Kincaid",
+   "price": 300
+  },
+  {
+   "player": "Greg Dortch",
+   "price": 2250
+  },
+  {
+   "player": "Patrick Mahomes",
+   "price": 500
+  },
+  {
+   "player": "Travis Kelce",
+   "price": 250
+  },
+  {
+   "player": "Josh Allen",
+   "price": -145
+  },
+  {
+   "player": "Tyrell Shavers",
+   "price": 1750
+  },
+  {
+   "player": "Jalen Royals",
+   "price": 1300
+  },
+  {
+   "player": "James Cook",
+   "price": -115
+  },
+  {
+   "player": "Xavier Worthy",
+   "price": 500
+  },
+  {
+   "player": "Khalil Shakir",
+   "price": 300
+  },
+  {
+   "player": "Emmett Johnson",
+   "price": -170
+  },
+  {
+   "player": "Keleki Latu",
+   "price": 2250
+  },
+  {
+   "player": "Jackson Hawes",
+   "price": 2250
+  },
+  {
+   "player": "Noah Gray",
+   "price": 850
+  },
+  {
+   "player": "Dawson Knox",
+   "price": 525
+  },
+  {
+   "player": "Jaydn Ott",
+   "price": 1200
+  },
+  {
+   "player": "Jake Briningstool",
+   "price": 1750
+  }
+ ]
+}
