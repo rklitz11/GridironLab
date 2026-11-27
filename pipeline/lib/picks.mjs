@@ -136,3 +136,22 @@ export function valueLines(props, sheet, calib, eligible = () => true) {
   }
   return out.sort((a, b) => b.edge - a.edge);
 }
+
+// ---------------------------------------------------------------- what to bet
+// A line is worth betting when the model's chance beats the break-even chance at the price actually offered (vig
+// included), by enough to pay for model error. Tiers:
+//   bet   — expected return of BET_EV or more per dollar, and the model's median projection is on the same side of the line
+//   lean  — expected return of LEAN_EV or more
+//   check — a gap above MAX_EDGE: often news the model has not seen (injury, new role); confirm before betting
+//   pass  — everything else
+export const BET_EV = 0.10, LEAN_EV = 0.04;
+export const UNITS = { bet: 1, lean: 0.5, check: 1 };
+export const payout = price => (price > 0 ? price / 100 : 100 / -price);
+export function betInfo(v) {
+  const win = payout(v.price), ev = v.model * win - (1 - v.model), breakeven = 1 / (1 + win);
+  const agrees = v.over ? v.proj > v.line : v.proj < v.line;
+  const tier = !(ev > 0) ? 'pass' : v.edge > MAX_EDGE ? 'check' : ev >= BET_EV && agrees ? 'bet' : ev >= LEAN_EV ? 'lean' : 'pass';
+  const units = UNITS[tier] || 0;
+  const pl = v.hit == null ? (v.act != null ? 0 : null) : v.hit ? units * win : -units;
+  return { ...v, ev, breakeven, agrees, tier, units, pl };
+}

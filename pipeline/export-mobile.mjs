@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { OUT } from './lib/config.mjs';
-import { loadPlayers, calibRows, buildCalib, buildPicks, valueLines, normName, STATS, MIN_EDGE, MAX_EDGE } from './lib/picks.mjs';
+import { loadPlayers, calibRows, buildCalib, buildPicks, valueLines, normName, STATS, MIN_EDGE, MAX_EDGE, betInfo, BET_EV, LEAN_EV } from './lib/picks.mjs';
 import { CACHE, isTdGame, TD_EXTRA_GAMES } from './lib/config.mjs';
 
 const meta = JSON.parse(fs.readFileSync(path.join(OUT, 'meta.json'), 'utf8'));
@@ -38,17 +38,25 @@ const playedLast = (gsis, team, gameday) => { const id = lastDone(team, gameday)
 const picks = buildPicks(players, liveCalib, season, g => !g.stats && (PICK_SCOPE === 'all' || g.gameday === nextDay), (p, g) => playedLast(p.gsis, g.team, g.gameday));
 
 // Value vs Hard Rock: saved prop lines (pipeline/props.mjs) against the model, graded once games finish.
-const value = {}, record = { value: [0, 0], big: [0, 0] };
+// Every line gets a tier (bet / lean / check / pass, see betInfo) and graded lines add to a season record in units.
+const value = {}, record = { bet: { w: 0, l: 0, pl: 0 }, lean: { w: 0, l: 0, pl: 0 }, check: { w: 0, l: 0, pl: 0 } };
+const TIER_ORDER = { bet: 0, lean: 1, check: 2 };
+const PER_GAME = 3, CHECKS_PER_GAME = 2;
+// Season-average trends: the back-test's top 4 per game hit about 73%; the rest add little.
+const TREND_CALLS = 4;
 for (const g of allGames) {
   const f = path.join(CACHE, 'props', `${g.game_id}.json`);
   if (!fs.existsSync(f)) continue;
   const props = JSON.parse(fs.readFileSync(f, 'utf8'));
   let sheet = [];
   try { sheet = JSON.parse(fs.readFileSync(path.join(OUT, 'games', `${g.game_id}.json`), 'utf8')); } catch {}
-  const all = valueLines(props, sheet, liveCalib, r => playedLast(r.gsis, r.team, g.gameday));
-  const v = { fetched: props.fetched_at, all, plays: all.filter(x => x.edge >= MIN_EDGE && x.edge <= MAX_EDGE).slice(0, 3), big: all.filter(x => x.edge > MAX_EDGE).slice(0, 2) };
-  for (const [k, list] of [['value', v.plays], ['big', v.big]]) for (const x of list) if (x.hit != null) record[k][x.hit ? 0 : 1]++;
-  value[g.game_id] = v;
+  const all = valueLines(props, sheet, liveCalib, r => playedLast(r.gsis, r.team, g.gameday)).map(x => ({ ...betInfo(x), gid: g.game_id }));
+  // Props in one game move together (a low-scoring game sinks every over), so at most PER_GAME bets/leans per game
+  // and CHECKS_PER_GAME checks are shown and counted in the record.
+  const byEv = (a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier] || b.ev - a.ev;
+  const bets = [...all.filter(x => x.tier === 'bet' || x.tier === 'lean').sort(byEv).slice(0, PER_GAME), ...all.filter(x => x.tier === 'check').sort(byEv).slice(0, CHECKS_PER_GAME)];
+  for (const x of bets) if (x.pl != null) { const r = record[x.tier]; if (x.hit != null) r[x.hit ? 'w' : 'l']++; r.pl += x.pl; }
+  value[g.game_id] = { fetched: props.fetched_at, all, bets, game: g };
 }
 const kick = g => {
   const d = new Date(`${g.gameday}T12:00:00`);
@@ -113,38 +121,58 @@ function picksBlock(list, g) {
   const fmt = (k, v) => (k === 'fantasy_points_ppr' || k === 'receptions' || k === 'carries' || k === 'completions' ? f1(v) : f0(v));
   // Hard Rock's line on the same player and stat, when it was pulled: the model's chance at the book's number,
   // the book's fair chance (vig removed) and the gap. The side is whichever the model prefers at that number.
-  const v = value[g.game_id];
-  const hr = c => {
-    const x = v?.all.find(y => y.stat === c.k && normName(y.name) === normName(c.name));
-    if (!x) return '';
-    const gap = Math.round(x.edge * 100);
-    const cls = x.edge >= MIN_EDGE && x.edge <= MAX_EDGE ? 'hr good' : x.edge > MAX_EDGE ? 'hr big' : 'hr';
-    const res = x.hit == null ? '' : x.hit ? ' · <span class="up">Hit</span>' : ' · <span class="down">Miss</span>';
-    return `<span class="${cls}">Hard Rock ${x.over ? 'O' : 'U'} ${x.line} (${x.price > 0 ? '+' : ''}${x.price}) · model ${Math.round(x.model * 100)}% vs ${Math.round(x.book * 100)}% · ${gap >= 0 ? '+' : ''}${gap}${x.edge > MAX_EDGE ? ' big gap' : ''}${res}</span>`;
-  };
-  const note = v ? `<p class="vnote">Green Hard Rock rows are 5–12 point gaps (model minus book, vig removed); the side shown is the model's pick at Hard Rock's number.</p>`
-    : `<p class="vnote">Hard Rock lines are added about 45 minutes before kickoff.</p>`;
-  return `<div class="picks"><h4>Confident calls</h4><ul>${list.map(c => `<li>
+  const note = `<p class="vnote">Against the player's season average, not Hard Rock's line. Not a bet on its own.</p>`;
+  return `<div class="picks"><h4>Season-average trends</h4><ul>${list.map(c => `<li>
     <span class="dir ${c.over ? 'over' : 'under'}">${c.over ? 'Over' : 'Under'}</span>
     <span class="what"><b>${esc(c.name)}</b> <span class="pos">${c.pos}</span> ${c.line} ${c.label}
-      <span class="why">avg ${fmt(c.k, c.avg)} in ${c.games} games · proj ${fmt(c.k, c.proj)}</span>${hr(c)}</span>
+      <span class="why">avg ${fmt(c.k, c.avg)} in ${c.games} games · proj ${fmt(c.k, c.proj)}</span></span>
     <span class="conf">${Math.round(c.conf * 100)}%</span></li>`).join('')}</ul>${note}</div>`;
 }
 
+// One line of the bet list: what to bet at Hard Rock, the tier and stake, and why.
+const TIER_LABEL = { bet: 'Bet', lean: 'Lean', check: 'Check' };
+const fmtPrice = p => (p > 0 ? `+${p}` : `${p}`);
+const fmtU = u => `${u > 0 ? '+' : u < 0 ? '−' : ''}${(Math.round(Math.abs(u) * 100) / 100).toFixed(2).replace(/\.?0+$/, '') || '0'}u`;
+function betRow(x, showGame) {
+  const g = value[x.gid]?.game;
+  const stat = STATS[x.stat]?.label || x.stat;
+  const pr = ['receptions', 'carries', 'completions', 'attempts'].includes(x.stat) ? f1(x.proj) : f0(x.proj);
+  const where = showGame && g ? `${g.away}@${g.home} ${g.done ? 'final' : kick(g).t.replace(' ET', '')} · ` : '';
+  const right = x.act == null ? `<span class="ev">+${Math.round(x.ev * 100)}%</span><span class="evl">exp. return</span>`
+    : x.hit == null ? '<span>Push</span>' : `<span class="${x.hit ? 'up' : 'down'}">${x.hit ? 'Hit' : 'Miss'}</span><span class="evl">${x.tier === 'check' ? 'if bet ' : ''}${fmtU(x.pl)}</span>`;
+  return `<li class="bet ${x.tier}">
+    <span class="tier">${TIER_LABEL[x.tier]}${x.tier === 'check' ? '' : `<small>${x.units === 1 ? '1u' : '½u'}</small>`}</span>
+    <span class="what"><b>${esc(x.name)}</b> <span class="pos">${x.pos}</span><span class="slip">${x.over ? 'Over' : 'Under'} ${x.line} ${stat} <span class="px">${fmtPrice(x.price)}</span></span>
+      <span class="why">${where}model ${Math.round(x.model * 100)}% · need ${Math.round(x.breakeven * 100)}% · proj ${pr}${x.act != null ? ` · actual ${x.act}` : ''}${x.tier === 'check' ? ' · confirm role/injury news first' : ''}</span></span>
+    <span class="conf">${right}</span></li>`;
+}
+const linesAt = v => new Date(v.fetched).toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit' });
 function valueBlock(g) {
   const v = value[g.game_id];
-  if (!v) return '';
-  const when = new Date(v.fetched).toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: 'numeric', minute: '2-digit' });
-  const fmtLine = x => `${x.line} ${STATS[x.stat]?.label || x.stat} (${x.price > 0 ? '+' : ''}${x.price})`;
-  const row = x => `<li>
-    <span class="dir ${x.over ? 'over' : 'under'}">${x.over ? 'Over' : 'Under'}</span>
-    <span class="what"><b>${esc(x.name)}</b> <span class="pos">${x.pos}</span> ${fmtLine(x)}
-      <span class="why">model ${Math.round(x.model * 100)}% · Hard Rock ${Math.round(x.book * 100)}% · proj ${STATS[x.stat] && ['receptions', 'carries'].includes(x.stat) ? f1(x.proj) : f0(x.proj)}${x.act != null ? ` · actual ${x.act}` : ''}</span></span>
-    <span class="conf">${x.hit == null ? '+' + Math.round(x.edge * 100) : x.hit ? '<span class="up">Hit</span>' : '<span class="down">Miss</span>'}</span></li>`;
-  return `<div class="picks value"><h4>Value vs Hard Rock</h4>
-  ${v.plays.length ? `<ul>${v.plays.map(row).join('')}</ul>` : `<p class="vnote">No gaps of ${Math.round(MIN_EDGE * 100)}–${Math.round(MAX_EDGE * 100)} points.</p>`}
-  ${v.big.length ? `<p class="vsub">Big gaps: usually news the model missed</p><ul>${v.big.map(row).join('')}</ul>` : ''}
-  <p class="vnote">Lines from ${when} ET. Numbers on the right are model minus Hard Rock, in percentage points, with the vig removed.</p></div>`;
+  if (!v) return g.done ? '' : `<div class="picks value"><h4>Hard Rock bets</h4><p class="vnote">Lines are added about 3 hours before kickoff.</p></div>`;
+  return `<div class="picks value"><h4>Hard Rock bets</h4>
+  ${v.bets.length ? `<ul>${v.bets.map(x => betRow(x, false)).join('')}</ul>` : `<p class="vnote">Nothing worth betting: no line clears the price.</p>`}
+  <p class="vnote">Hard Rock lines from ${linesAt(v)} ET · ${v.all.length} lines checked.</p></div>`;
+}
+
+// Bet board: every bet, lean and check across the week's games in one list, best first, with the week's graded result.
+// Kickoff has passed but the result isn't in the data yet: no longer bettable, not yet graded.
+const etOffset = d => (new Date(d.toLocaleString('en-US', { timeZone: 'America/New_York' })) - new Date(d.toLocaleString('en-US', { timeZone: 'UTC' }))) / 36e5;
+const started = g => { if (g.done || !g.gametime) return !!g.done; const t = new Date(`${g.gameday}T${g.gametime}:00Z`); return Date.now() > t.getTime() - etOffset(t) * 36e5; };
+function boardBlock(w) {
+  const vs = Object.values(value).filter(v => v.game.week === w);
+  if (!vs.length) return allGames.some(g => g.week === w && !g.done) ? `<section class="board"><h3>Bet board <span>Hard Rock</span></h3><p class="vnote">Bets show up here when each game's Hard Rock lines are pulled, about 3 hours before kickoff.</p></section>` : '';
+  const live = vs.filter(v => !v.game.done && started(v.game)).length;
+  const openAll = vs.filter(v => !started(v.game)).flatMap(v => v.bets).sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier] || b.ev - a.ev);
+  const open = openAll.filter(x => x.tier !== 'check'), checks = openAll.filter(x => x.tier === 'check');
+  const graded = vs.filter(v => v.game.done).flatMap(v => v.bets).filter(x => x.tier !== 'check');
+  const w_ = graded.filter(x => x.hit === true).length, l_ = graded.filter(x => x.hit === false).length, pl = graded.reduce((a, x) => a + (x.pl || 0), 0);
+  const pending = allGames.filter(g => g.week === w && !g.done && !value[g.game_id]).length;
+  return `<section class="board"><h3>Bet board <span>Hard Rock · best first</span></h3>
+  ${open.length ? `<ul>${open.map(x => betRow(x, true)).join('')}</ul>` : `<p class="vnote">${vs.some(v => !started(v.game)) ? 'No open line clears the price.' : 'No open games with lines yet.'}${live ? ` ${live} game${live > 1 ? 's' : ''} already kicked off, graded once the box score is in.` : ''}</p>`}
+  ${checks.length ? `<details class="more"><summary>Check news first (${checks.length})</summary><ul>${checks.map(x => betRow(x, true)).join('')}</ul></details>` : ''}
+  ${graded.length ? `<p class="wkres">This week so far (bets + leans): ${w_}–${l_} · <span class="${pl >= 0 ? 'up' : 'down'}">${fmtU(pl)}</span></p>` : ''}
+  <p class="vnote"><b>Bet</b> = model's chance beats the break-even at Hard Rock's price by ${Math.round(BET_EV * 100)}%+ expected return and the projection agrees (1 unit). <b>Lean</b> = ${Math.round(LEAN_EV * 100)}%+ (½ unit). <b>Check</b> = gap so big it's often news the model missed; bet only after confirming the player's role. At most ${PER_GAME} bets/leans per game, since props in one game rise and fall together. "Need" is the break-even win rate at that price.${pending ? ` ${pending} more game${pending > 1 ? 's' : ''} get lines about 3 hours before kickoff.` : ''}</p></section>`;
 }
 
 // Best TD chances: the week's 10 players most likely to score a rushing or receiving TD in Sunday and Monday games.
@@ -208,8 +236,8 @@ function gameCard(g) {
       <div><em>Win</em><b>${wp == null ? '–' : wp >= 0.5 ? `${g.home} ${pct(wp)}` : `${g.away} ${pct(1 - wp)}`}</b><span>ML ${g.home_ml != null ? `${g.home} ${sgn(g.home_ml)}` : '–'}</span></div>
     </div>
     <div class="ctx"><span>${esc(wx)}</span>${lean}<span class="chev" aria-hidden="true"></span></div>
-    ${picksBlock(picks[g.game_id], g)}
     ${valueBlock(g)}
+    ${picksBlock(picks[g.game_id]?.slice(0, TREND_CALLS), g)}
   </summary>
   <div class="body">${qbs}${teamBlock(g, 'home')}${teamBlock(g, 'away')}</div>
 </details>`;
@@ -230,6 +258,7 @@ for (const w of weeks) {
   }
   fragments[w] = `<div class="wk-head"><h2>Week ${w}${w === currentWeek ? ' <span>this week</span>' : ''}</h2><p>${status}</p></div>
 <nav class="jump" aria-label="Jump to game">${games.map(g => `<a href="#${slug(g)}">${g.away}@${g.home}</a>`).join('')}</nav>
+${boardBlock(w)}
 ${tdBlock(w)}
 ${cards}`;
 }
@@ -350,17 +379,36 @@ footer { font-size: 12px; color: var(--muted); }
 .final { color: var(--fg); font-weight: 600; }
 .sc.fin { color: var(--fg); font-weight: 700; }
 .up { color: var(--turf); } .down { color: var(--bad); }
+.board { background: var(--card); border: 2px solid var(--turf); border-radius: 12px; padding: 12px 14px; }
+.board h3 { margin: 0 0 8px; font: 700 22px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.board h3 span { font: 500 11px var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.board ul, .picks.value ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+li.bet { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+li.bet .tier { font: 700 12px/1 var(--body); text-transform: uppercase; letter-spacing: .04em; text-align: center; border-radius: 6px; padding: 5px 0 4px; display: grid; gap: 2px; }
+li.bet .tier small { font: 600 10px/1 var(--body); text-transform: none; letter-spacing: 0; opacity: .85; }
+li.bet.bet .tier { background: var(--turf); color: var(--card); }
+li.bet.lean .tier { background: var(--turf-soft); color: var(--turf); }
+li.bet.check .tier { background: var(--warn-bg); color: var(--warn); }
+li.bet .what { font-size: 13px; min-width: 0; }
+li.bet .slip { display: block; font-weight: 600; margin-top: 1px; }
+li.bet .px { color: var(--fg2); font-weight: 500; }
+li.bet .why { display: block; font-size: 11px; color: var(--muted); }
+li.bet .conf { display: grid; justify-items: end; gap: 1px; font: 700 18px/1 var(--display); }
+li.bet .evl { font: 500 10px var(--body); color: var(--muted); }
+.board details.more { margin-top: 10px; }
+.board details.more summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--warn); padding: 4px 0 8px; }
+.wkres { margin: 8px 0 0; font-size: 12px; font-weight: 600; color: var(--fg2); }
 @media (prefers-reduced-motion: reduce) { .chev { transition: none; } }
 </style>
 <div class="wrap">
 <header>
   <h1>Gridiron <span>Lab</span></h1>
   <p>${season} season · updated ${esc(stamp)} ET · tap a game for player projections</p>
-  ${record.value[0] + record.value[1] + record.big[0] + record.big[1] ? `<p class="record">Value vs Hard Rock so far: ${record.value[0]}–${record.value[1]} · big gaps ${record.big[0]}–${record.big[1]}</p>` : ''}
+  ${['bet', 'lean', 'check'].some(k => record[k].w + record[k].l) ? `<p class="record">Season vs Hard Rock: Bets ${record.bet.w}–${record.bet.l} <span class="${record.bet.pl >= 0 ? 'up' : 'down'}">${fmtU(record.bet.pl)}</span> · Leans ${record.lean.w}–${record.lean.l} <span class="${record.lean.pl >= 0 ? 'up' : 'down'}">${fmtU(record.lean.pl)}</span> · Checks ${record.check.w}–${record.check.l} <span class="${record.check.pl >= 0 ? 'up' : 'down'}">${fmtU(record.check.pl)}</span></p>` : ''}
 </header>
 <nav class="weeks" aria-label="Choose week">${weeks.map(w => `<a href="#w${w}" data-w="${w}" class="${w === currentWeek ? 'cur' : ''}">${w}</a>`).join('')}</nav>
 ${weeks.map(w => `<section class="week" id="w${w}" data-w="${w}" hidden><p class="muted">Loading Week ${w}…</p></section>`).join('')}
-<footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable. Confident calls compare the projection with the player's season average (3+ games) on pass attempts, completions, pass yards, carries, rush yards, receptions and receiving yards; the percentage is the chance of the call hitting, from how projections like it played out in 2025–26 games the model had not seen. In that back-test the top 4 calls per game hit about 73%.</footer>
+<footer>Model scores never see the betting line. PPR projections show the median with an 80% range (10th–90th percentile). Injury tags come from the latest official report. Before Wednesday's report, players who missed last week show as Questionable. Season-average trends compare the projection with the player's season average (3+ games) on pass attempts, completions, pass yards, carries, rush yards, receptions and receiving yards; the percentage is the chance of the call hitting, from how projections like it played out in 2025–26 games the model had not seen. In that back-test the top 4 calls per game hit about 73%.</footer>
 </div>
 <script>
 // Week tabs: #w12 shows week 12, #w12-kc-buf shows week 12 and opens that game; no hash shows the current week.
